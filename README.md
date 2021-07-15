@@ -1,7 +1,7 @@
 # DeeBee Bot: A Personal Discord Bot
 DeeBee bot is a personal discord bot made as a self tutorial / introduction to python.
 
-The bot is hosted and ran at **[Replit](https://replit.com/ "Replit")**
+The bot is hosted and ran at **[Replit](https://replit.com/@ddotb/DeeBee "Replit")**
 
 This is my way to learn and achieve many goals in using python.
 
