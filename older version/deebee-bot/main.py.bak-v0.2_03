@@ -1,0 +1,110 @@
+import discord
+import os
+import numpy
+from keep_alive import keep_alive
+from distutils.util import strtobool
+#from discord.ext import commands
+
+client = discord.Client()
+listener = "deebee "
+#bot = commands.Bot( command_prefix="deebee " )
+
+@client.event
+async def on_ready():
+    print( 'logged in as {0.user}'.format( client ) )
+
+
+@client.event
+async def on_message( msg ):
+  if msg.author == client.user:
+    return
+
+  def emote(animated, emojiName):
+    for i in client.emojis:
+      j = str( i )
+      if animated is True:
+        if emojiName in j.lower() and '<a:' in j.lower():
+          return j
+          break
+      if animated is False:
+        if emojiName in j.lower():
+          return j
+          break
+    if animated == False:
+      return "Error retrieving emote. Check name or spelling."
+    elif animated == True:
+      return "Error retriving animated emote. Check name or spelling."
+
+  #if msg.content.lower().startswith( listener + 'init'):
+  #  tmpL = numpy.array_split(client.emojis, 10)
+  #  for i in tmpL:
+  #    await msg.channel.send( i )
+
+  if msg.content.lower().startswith( listener + 'hello' ):
+    await msg.channel.send('Hello!')
+
+  if ( msg.content.lower().startswith( listener + 'bitch' ) ) or ( client.user in msg.mentions ) or ( "bitches" in msg.content.lower() ):
+    if ( str( msg.author.id ) != '237793368132943874' ):
+      await msg.channel.send( emote(False,"bij") + ' what? <@' + str( msg.author.id ) + '>' )
+    if ( str( msg.author.id ) == '237793368132943874' ):
+      await msg.channel.send( 'eyy <@' + str( msg.author.id ) + '>! what\'s up' )
+
+  if msg.content.lower().startswith( listener + 'emote' ):
+    msgCont = []
+    msgCont = msg.content.lower().split( ' ' )
+    if len( msgCont ) == 3 and msgCont[2] != 'help':
+      msgCont.append( '' )
+    anim = True if ( msgCont[3] == 'true' or msgCont[3] == 't' ) else False
+    #if msgCont[3] == 'true' or msgCont[3] == 't':
+    #  anim = True
+    #elif msgCont[3] == 'false' or msgCont[3] == 'f' or msgCont[3] == '':
+    #  anim = False
+    await msg.channel.send( emote( anim, msgCont[2] ) )
+    if msgCont[2] == 'help':
+      await msg.channel.send( "Command:\n`deebee emote {emote name} {animated? ((t)rue/(f)alse)}`" )
+
+
+  if 'wiggle' in msg.content.lower():
+    await msg.channel.send( emote(True, "wiggle") )
+    await msg.add_reaction( emoji = emote( True, "wiggle" ) )
+
+  if 'popcat' in msg.content.lower():
+    await msg.channel.send( emote( True, "popcat" ) )
+
+  if 'catjam' in msg.content.lower():
+    await msg.channel.send( emote(True, "catjam") )
+
+  if msg.content.lower() == 'bitch' or 'bitch ' in msg.content.lower() or ' bitch' in msg.content.lower() or 'bij' in msg.content.lower():
+    await msg.add_reaction( emoji = emote( False, "bij" ) )
+
+  if 'blobdance' in msg.content.lower():
+    await msg.channel.send( emote( True, "blobdance" ) + emote( True, "blobdance" ) + emote( True, "blobdance" ) )
+
+  if 'peped' in msg.content.lower():
+    await msg.channel.send( emote( True, "peped" ) + emote( True, "peped" ) + emote( True, "peped" ) )
+
+  if 'w pc' in "".join(dict.fromkeys(msg.content.lower())):
+    await msg.channel.send( emote( False, "emoji_34" ) + emote( False, "emoji_34" ) + emote( False, "emoji_34" ) )
+    await msg.add_reaction( emoji = emote( False, "emoji_34" ) )
+
+  if 'ock' in msg.content.lower():
+    temp = []
+    cont = []
+    cont = msg.content.lower().split(' ')
+    for i in cont:
+      if i not in temp:
+        temp.append(i)
+    for j in temp:
+      if 'ock' in j:
+        await msg.channel.send( emote( False, "yep" ) + " " + j)
+
+  
+
+  # start of test section
+
+  #content
+
+  # end of test section
+
+keep_alive()
+client.run( os.getenv( 'TOKEN' ) )

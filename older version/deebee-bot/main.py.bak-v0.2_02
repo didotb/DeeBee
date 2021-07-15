@@ -1,0 +1,108 @@
+import discord
+import os
+import numpy
+from keep_alive import keep_alive
+
+client = discord.Client()
+listener = "deebee "
+
+@client.event
+async def on_ready():
+    print( 'logged in as {0.user}'.format( client ) )
+
+
+@client.event
+async def on_message( msg ):
+  if msg.author == client.user:
+    return
+
+  def emote(animated, emojiName):
+    for i in client.emojis:
+      #debug
+      print( 'for loop' )
+      #end
+      j = str( i )
+      if animated is True:
+        if emojiName in j.lower() and '<a:' in j.lower():
+          #debug
+          print( 'found' )
+          print( i )
+          #end
+          return j
+          #debug
+          print( 'sent' )
+          #end
+          break
+      if animated is False:
+        if emojiName in j.lower():
+          #debug
+          print( 'found' )
+          print( i )
+          #end
+          return j
+          #debug
+          print( 'sent' )
+          #end
+          break
+    return 0
+
+  #if msg.content.lower().startswith( listener + 'init'):
+  #  tmpL = numpy.array_split(client.emojis, 10)
+  #  for i in tmpL:
+  #    await msg.channel.send( i )
+
+  if msg.content.lower().startswith( listener + 'hello' ):
+    await msg.channel.send('Hello!')
+
+  if ( msg.content.lower().startswith( listener + 'bitch' ) or client.user in msg.mentions or "bitches" in msg.content.lower() ):
+    if ( msg.author.id != '237793368132943874' ):
+      await msg.channel.send( '<:bij:781455297130135582> what? <@' + str( msg.author.id ) + '>' )
+    if ( msg.author.id == '237793368132943874' ):
+      await msg.channel.reply( 'eyy <@' + str( msg.author.id ) + '>! what\'s up' )
+
+
+  if 'wiggle' in msg.content.lower():
+    await msg.channel.send( '<a:wiggle:781457957245550613>' )
+    await msg.add_reaction( emoji = "a:wiggle:781457957245550613" )
+
+  #if 'popcat' in msg.content.lower():
+  #  await msg.channel.send( '<a:popCat:797464944329097216>' )
+
+  if 'catjam' in msg.content.lower():
+    await msg.channel.send( '<a:catJam:797470872356782091>' )
+
+  if msg.content.lower() == 'bitch' or 'bitch ' in msg.content.lower() or ' bitch' in msg.content.lower() or 'bij' in msg.content.lower():
+    await msg.add_reaction( emoji = ":bij:781455297130135582")
+
+  if 'blobdance' in msg.content.lower():
+    await msg.channel.send( '<a:blobdance:802107472721608724><a:blobdance:802107472721608724><a:blobdance:802107472721608724>' )
+
+  if 'peped' in msg.content.lower():
+    await msg.channel.send( '<a:pepeD:802123073481474088><a:pepeD:802123073481474088><a:pepeD:802123073481474088>' )
+
+  if 'w pc' in "".join(dict.fromkeys(msg.content.lower())):
+    await msg.channel.send('<:emoji_34:730728238229356546><:emoji_34:730728238229356546><:emoji_34:730728238229356546>')
+    await msg.add_reaction( emoji = ":emoji_34:730728238229356546" )
+
+  if 'ock' in msg.content.lower():
+    temp = []
+    cont = []
+    cont = msg.content.lower().split(' ')
+    for i in cont:
+      if i not in temp:
+        temp.append(i)
+    for j in temp:
+      if 'ock' in j:
+        await msg.channel.send('<:YEP:802801441009041410> ' + j)
+
+  
+
+  # start of test section
+
+  if 'popcat' in msg.content.lower():
+    await msg.channel.send( emote(True,"popcat") )
+
+  # end of test section
+
+keep_alive()
+client.run( os.getenv( 'TOKEN' ) )

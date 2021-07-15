@@ -1,0 +1,110 @@
+import discord
+import os
+import asyncio
+#import numpy
+from keep_alive import keep_alive
+from weather import weather
+#from distutils.util import strtobool
+#from discord.ext import commands
+
+client = discord.Client()
+listener = "deebee"
+greeting = ['hello', 'hi']
+positive = ['true', 't']
+negative = ['false', 'f']
+msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'peped']
+msgTrig = ['bij', 'bitch']
+msgYEP = ['sock', 'cock', 'rock', 'dock', 'stock', 'clock', 'croc', 'lock' 'knock', 'mock', 'jock']
+#bot = commands.Bot( command_prefix="deebee " )
+
+def emote(animated, emojiName):
+  for i in client.emojis:
+    j = str( i )
+    if animated is True:
+      if emojiName in j.lower() and '<a:' in j.lower():
+        return j
+        break
+    if animated is False:
+      if emojiName in j.lower():
+        return j
+        break
+  if animated == False:
+    return "Error retrieving emote. Check name or spelling."
+  elif animated == True:
+    return "Error retriving animated emote. Check name or spelling."
+
+@client.event
+async def on_ready():
+    print( 'logged in as {0.user}'.format( client ) )
+
+@client.event
+async def on_message( msg ):
+  if msg.author == client.user:
+    return
+
+  msgCont = []
+  msgCont = msg.content.lower().split( ' ' )
+
+  mTrigA = ( cont for cont in msgCont if cont in msgTrigA )
+  mTrig = ( cont for cont in msgCont if cont in msgTrig )
+  mYep = ( cont for cont in msgCont if cont in msgYEP )
+
+  if( listener in msgCont[0] and len( msgCont ) > 1 ):
+    if( msgCont[1] in greeting ):
+      await msg.channel.send( 'Hello!' )
+
+    if( 'emote' in msgCont[1] ):
+      if( len( msgCont ) == 3 ): msgCont.append( 'false' )
+      if( ( msgCont[3] in negative ) ): anim = False
+      elif( msgCont[3] in positive ): anim = True
+      else: await msg.channel.send( "Command:\n`deebee emote {emote name} {animated?((t)rue/(f)alse)}`" )
+      await msg.channel.send( emote( anim, msgCont[2] ) )
+
+    if( 'weather' in msgCont[1] ):
+      await msg.channel.send( "Please wait 30 seconds. Generating images.\nPlease use weather command sparingly. Bot might get banned for using too much resource." )
+      weather()
+      await asyncio.sleep(20)
+      await msg.channel.send( file=discord.File( 'out.mp4' ) )
+
+  for cont in mTrigA:
+    if cont == 'wiggle':
+      await msg.add_reaction( emoji = emote( True, cont ) )
+      await msg.channel.send( emote( True, cont ) )
+    elif cont in {'blobdance', 'peped'}:
+      await msg.channel.send( emote( True, cont ) + emote( True, cont ) + emote( True, cont ) )
+    else:
+      await msg.channel.send( emote( True, cont ) )
+  
+  for cont in mTrig:
+    if cont == 'bitch':
+      cont = 'bij'
+      await msg.add_reaction( emoji = emote( False, cont ) )
+    await msg.channel.send( emote( False, cont ) )
+
+  for cont in mYep:
+    await msg.channel.send( emote( False, 'yep' ) + ' ' + cont )
+
+
+  # new code above
+  # old code bellow
+
+
+  if ( msg.content.lower().startswith( listener + 'bitch' ) ) or ( client.user in msg.mentions ) or ( "bitches" in msg.content.lower() ):
+    if ( str( msg.author.id ) != '237793368132943874' ):
+      await msg.channel.send( emote(False,"bij") + ' what? <@' + str( msg.author.id ) + '>' )
+    if ( str( msg.author.id ) == '237793368132943874' ):
+      await msg.channel.send( 'eyy <@' + str( msg.author.id ) + '>! what\'s up' )
+
+  if 'new pc' in msg.content.lower():
+    await msg.channel.send( emote( False, "emoji_34" ) + emote( False, "emoji_34" ) + emote( False, "emoji_34" ) )
+    await msg.add_reaction( emoji = emote( False, "emoji_34" ) )
+  
+
+  # start of test section
+
+  #content
+
+  # end of test section
+
+keep_alive()
+client.run( os.getenv( 'TOKEN' ) )
