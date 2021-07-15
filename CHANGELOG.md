@@ -9,6 +9,7 @@
 + v1.0:                  successfuly migrated commands to `discord.ext.commands` API
 + v1.1:                  added `roll` command to roll dice.
 + v1.2:                  changed how message reaction worked
++ v1.2_01:          made `weather`, and `keep_alive` modules optional
 #
 ### Weather app
 + v0.1:                  simple app to pull weather images, then convert to video

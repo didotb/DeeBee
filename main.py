@@ -1,8 +1,15 @@
-import discord, os, asyncio, pytz, weather, datetime, random
-#import numpy
-from keep_alive import keep_alive
-#from distutils.util import strtobool
+import discord, os, asyncio, pytz, datetime, random, sys
 from discord.ext import commands, tasks
+try:
+	import weather
+except:
+	print( "weather.py is missing. Bot will not be able to use weather command." )
+	pass
+try:
+	from keep_alive import keep_alive
+except:
+	print( "keep_alive.py is missing. Although optional, UptimeRobot will not be able to monitor bot uptime status." )
+	pass
 
 listener = "db ", "deebee "
 intents = discord.Intents.default()
@@ -83,29 +90,30 @@ async def debug( msg:str = None, pre_msg:int = None, cid:int = int( os.environ[ 
 	await channel.send( "`" + ts + message + "`" )
 	return
 
-@tasks.loop( hours=1 )
-async def sched_weather():
-	hours = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%H' ) )
-	print( "Another hour has passed: " + str( hours + 1 ) )
+if 'weather' in sys.modules:
+	@tasks.loop( hours=1 )
+	async def sched_weather():
+		hours = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%H' ) )
+		print( "Another hour has passed: " + str( hours + 1 ) )
 
-	if hours % 4 == 3:
-		await debug( pre_msg = 1 )
-		channel = bot.get_channel( int( os.environ[ 'discord-channel_vii-weather' ] ) )
-		async with channel.typing():
+		if hours % 4 == 3:
+			await debug( pre_msg = 1 )
+			channel = bot.get_channel( int( os.environ[ 'discord-channel_vii-weather' ] ) )
 			weather.weather( 'latest' )
-			await asyncio.sleep( 30 )
-		await channel.send(  "__4 hour interval__ daily weather images", file = discord.File( 'out.mp4' ) )
-		await debug( pre_msg = 4 )
-		weather.clean()
-		await debug( pre_msg = 0 )
+			async with channel.typing():
+				await asyncio.sleep( 30 )
+			await channel.send(  "__4 hour interval__ daily weather images", file = discord.File( 'out.mp4' ) )
+			await debug( pre_msg = 4 )
+			weather.clean()
+			await debug( pre_msg = 0 )
 
-@sched_weather.before_loop
-async def before():
-	minutes = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%M' ) )
-	seconds = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%S' ) )
-	wait = 3600 - ( ( ( minutes + 1 ) * 60 ) + ( seconds - 30 ) )
-	await asyncio.sleep( wait )
-	await bot.wait_until_ready()
+	@sched_weather.before_loop
+	async def before():
+		minutes = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%M' ) )
+		seconds = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%S' ) )
+		wait = 3600 - ( ( ( minutes + 1 ) * 60 ) + ( seconds - 30 ) )
+		await asyncio.sleep( wait )
+		await bot.wait_until_ready()
 
 @bot.event
 async def on_ready():
@@ -213,12 +221,15 @@ async def send_sticker(ctx, name:str):
 
 @bot.command( name='weather', description="Send animated weather satelite images as mp4 video file." )
 async def send_weather(ctx):
+	if 'weather' not in sys.modules:
+		await ctx.send(content="Weather module was not imported. Please check console for problems.")
+		return None
 	await debug( msg="Requested weather command" )
-	await ctx.send( content="Please wait 1 minute. Generating __requested__ images.", delete_after=35.0, reference=ctx.message, mention_author=False )
+	await ctx.send( content="Please wait 1 minute. Generating __requested__ images.", delete_after=33.0, reference=ctx.message, mention_author=False )
 	weather.weather( 'latest' )
 	async with ctx.typing():
 		await asyncio.sleep(30)
-		await ctx.send(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'), reference=ctx.message, mention_author=True)
+	await ctx.send(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'), reference=ctx.message, mention_author=True)
 	await debug( pre_msg=4 )
 	weather.clean()
 	await debug( pre_msg=0 )
@@ -247,6 +258,8 @@ async def send_emote_error(ctx, error):
 ### RUN EVERYTHING ###
 ###
 
-sched_weather.start()
-keep_alive()
+if 'weather' in sys.modules:
+	sched_weather.start()
+if 'keep_alive' in sys.modules:
+	keep_alive()
 bot.run(os.getenv( 'TOKEN' ))
