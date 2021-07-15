@@ -129,24 +129,24 @@ async def on_message(msg):
 	# if message author is itself or another bot, ignore it
 	if msg.author == bot.user or msg.author.bot:
 		return
-
-	for cont in mTrigA:
-		if cont == 'wiggle':
-			if msg.reference is None:
-				await msg.add_reaction(emoji=emote(True, cont))
-			elif msg.reference is not None:
-				refmsg = await msg.channel.fetch_message(msg.reference.message_id)
-				await refmsg.add_reaction(emoji=emote(True, cont))
-		elif cont in {'blobdance', 'pepeds'}:
-			await msg.channel.send(
-					emote(True, cont) + emote(True, cont) + emote(True, cont))
-		else:
-			await msg.channel.send(emote(True, cont))
-	for cont in mTrig:
-		cont = 'bij' if cont == 'bitch' else cont
-		await msg.add_reaction(emoji=emote(False, cont))
-	for cont in mYep:
-		await msg.add_reaction(emoji=emote(False, 'yep'))
+	if not (msg.content.startswith(listener)):
+		for cont in mTrigA:
+			if cont == 'wiggle':
+				if msg.reference is None:
+					await msg.add_reaction(emoji=emote(True, cont))
+				elif msg.reference is not None:
+					refmsg = await msg.channel.fetch_message(msg.reference.message_id)
+					await refmsg.add_reaction(emoji=emote(True, cont))
+			elif cont in {'blobdance', 'pepeds'}:
+				await msg.channel.send(
+						emote(True, cont) + emote(True, cont) + emote(True, cont))
+			else:
+				await msg.channel.send(emote(True, cont))
+		for cont in mTrig:
+			cont = 'bij' if cont == 'bitch' else cont
+			await msg.add_reaction(emoji=emote(False, cont))
+		for cont in mYep:
+			await msg.add_reaction(emoji=emote(False, 'yep'))
 
 	if (bot.user in msg.mentions) or ("bitches" in msg.content.lower()):
 		await msg.channel.send(content=await bot_startled(str(msg.author.id)), reference=msg, mention_author=True)

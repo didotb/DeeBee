@@ -8,6 +8,7 @@
 + v0.4:                  added weather command see Weather app updates
 + v1.0:                  successfuly migrated commands to `discord.ext.commands` API
 + v1.1:                  added `roll` command to roll dice.
++ v1.2:                  changed how message reaction worked
 #
 ### Weather app
 + v0.1:                  simple app to pull weather images, then convert to video
