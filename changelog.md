@@ -7,7 +7,7 @@
 + v0.3:                  overhaul with entire code: simplified the conditional statements
 + v0.4:                  added weather command see Weather app updates
 + v1.0:                  successfuly migrated commands to `discord.ext.commands` API
-+ v1.1:                  added `roll` command
++ v1.1:                  added `roll` command to roll dice.
 #
 ### Weather app
 + v0.1:                  simple app to pull weather images, then convert to video
@@ -36,7 +36,8 @@
   + add `entire day` capability
     + use https://www.data.jma.go.jp/mscweb/data/himawari/list_r2w.html for image data
 + Integrate word definition lookup
-  + ~~use PyDictionary~~ Research for alternatives
+  + ~~use PyDictionary~~ ~~Research for alternatives~~
+  + [spaCy](https://spacy.io/ "spaCy") is an open source natural language processing
 
 #
 #
