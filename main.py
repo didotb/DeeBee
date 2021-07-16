@@ -30,9 +30,11 @@ def emote(animated, emojiName):
 		if animated is True:
 			if eName in j.lower() and '<a:' in j.lower():
 				return j
-		if animated is False:
+		elif animated is False:
 			if eName in j.lower() and '<a:' not in j.lower():
 				return j
+		else:
+			return "argument: animated not initialized"
 	if animated == False:
 		return "`Error retrieving emote. Check name or spelling.`"
 	elif animated == True:
@@ -42,7 +44,7 @@ def roll(start, stop):
 	if start == '':
 		start = 1
 	if stop == '':
-		return 'Error in command argument. -> '+stop+' is empty.'
+		return 'Error in command argument. -> second argument is empty.'
 	try:
 		fi = int(start)
 	except ValueError:
