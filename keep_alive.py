@@ -28,7 +28,7 @@ def home():
 	header = 'full header request: ' + str( request.headers )
 	with open( 'flask.log', 'a' ) as file:
 		file.write( dt + ip + ' ' + browser + '\n' + header )'''
-	return redirect( "https://stat.ddotb.tk/", code = 301 )
+	return redirect( "https://stat.ddotb.tk/" )
 
 @app.route( '/hook/' )
 def hook_redirect():
