@@ -99,15 +99,12 @@ if 'weather' in sys.modules:
 		print( "Another hour has passed: " + str( hours + 1 ) )
 		channel = bot.get_channel( int( os.environ[ 'discord-channel_vii-weather' ] ) )
 
-		if hours % 2 == 1 and (10 <= hours <= 14):
+		if hours == 9 or hours == 13:
 			await debug(pre_msg=1)
 			weather.weather('latest')
 			async with channel.typing():
 				await asyncio.sleep(30)
 			await channel.send("__2 hour interval__ mid-day daily weather images", file = discord.File('out.mp4'))
-			await debug(pre_msg=4)
-			weather.clean()
-			await debug(pre_msg=0)
 
 		if hours % 4 == 3:
 			await debug( pre_msg = 1 )
@@ -115,9 +112,10 @@ if 'weather' in sys.modules:
 			async with channel.typing():
 				await asyncio.sleep( 30 )
 			await channel.send(  "__4 hour interval__ daily weather images", file = discord.File( 'out.mp4' ) )
-			await debug( pre_msg = 4 )
-			weather.clean()
-			await debug( pre_msg = 0 )
+
+		await debug( pre_msg = 4 )
+		weather.clean()
+		await debug( pre_msg = 0 )
 
 	@sched_weather.before_loop
 	async def before():

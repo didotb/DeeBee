@@ -18,6 +18,7 @@
 + v0.2_02:          changed time loop from `1 hour` to `5 minutes`
 + v0.2_03:          reverted back to `1 hour` from `5 minutes`
 + v0.3:                  added 2-hour interval mid-day in addition to 4-hour interval daily
++ v0.3_01:          code cleanup and absolute timing for 2-hour interval
 #
 ### Web Server
 + v0.1:                  added redirect to uptimerobot monitor
