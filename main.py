@@ -113,9 +113,10 @@ if 'weather' in sys.modules:
 				await asyncio.sleep( 30 )
 			await channel.send(  "__4 hour interval__ daily weather images", file = discord.File( 'out.mp4' ) )
 
-		await debug( pre_msg = 4 )
-		weather.clean()
-		await debug( pre_msg = 0 )
+		if os.path.exists(weather.target):
+			await debug( pre_msg = 4 )
+			weather.clean()
+			await debug( pre_msg = 0 )
 
 	@sched_weather.before_loop
 	async def before():
