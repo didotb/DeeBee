@@ -10,6 +10,7 @@
 + **1.1**: added `roll` command to roll dice.
 + **1.2**: changed how message reaction worked
 + **1.2_01**: made `weather`, and `keep_alive` modules optional
++ **1.3**: added Discord Interactions
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
@@ -37,8 +38,9 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ Create Application Commands (A.K.A Slash Commands)
++ sleep
 ### To Do
+###### **_Expand items on To Do list. Be more concise._**
 + Implement attachment virus scanning with VirusTotal API
   + Additionally, Link malware scanning
 # 

@@ -1,5 +1,6 @@
 import discord, os, asyncio, pytz, datetime, random, sys
 from discord.ext import commands, tasks
+from discord_slash import SlashCommand, SlashContext
 try:
 	import weather
 except:
@@ -12,8 +13,6 @@ except:
 	pass
 
 listener = "db ", "deebee "
-intents = discord.Intents.default()
-intents.members = True
 greeting = ['hello', 'hi']
 positive = ['true', 't']
 negative = ['false', 'f']
@@ -21,7 +20,8 @@ mf = ['motherfucker', 'modafaka', 'motherfuka', 'madafaka']
 msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
-bot = commands.Bot( command_prefix=listener, intents=intents, owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
+bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
+slash = SlashCommand(bot, sync_commands=True)
 
 def emote(animated, emojiName):
 	eName = emojiName.lower()
@@ -260,6 +260,16 @@ async def bitch_react(ctx):
 async def roll_cmd(ctx, dice:str):
 	splint = dice.split('d')
 	await ctx.send(content=roll(splint[0],splint[1]), reference=ctx.message, mention_author=False)
+
+@slash.slash(name="test", description="Just a test :p")
+async def _test(ctx: SlashContext):
+	embed = discord.Embed(title="Embed test", description=":p", colour=discord.Colour(0xd6b4d8))
+	await ctx.send(content="test", embeds=[embed])
+
+@slash.context_menu(name="apps test", target=3)
+async def ctx_menu_test(ctx: SlashContext):
+	embed = discord.Embed(title="Apps test", description="yep, another test, but this time from Apps menu :p", colour=discord.Colour(0xd6b4d8))
+	await ctx.send(content="yes, this is a test.. again", embeds=[embed])
 
 ##
 ## ERROR HANDLERS ##
