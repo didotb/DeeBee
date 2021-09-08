@@ -37,9 +37,8 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ nothing yet
-### To Do
 + Create Application Commands (A.K.A Slash Commands)
+### To Do
 + Implement attachment virus scanning with VirusTotal API
   + Additionally, Link malware scanning
 # 
