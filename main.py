@@ -34,7 +34,7 @@ def emote(animated, emojiName):
 			if eName in j.lower() and '<a:' not in j.lower():
 				return j
 		else:
-			return "argument: animated not initialized"
+			return "argument: `animated` is missing."
 	if animated == False:
 		return "`Error retrieving emote. Check name or spelling.`"
 	elif animated == True:
@@ -208,6 +208,13 @@ async def on_message(msg):
 ##
 ## BOT COMMANDS ##
 ##
+
+@bot.command( name='troll', hidden=True )
+async def troll(ctx):
+	cnl = bot.get_channel(int(os.environ['discord-channel_vii-weather']))
+	cnt = f"<@{os.environ['discord-user_d.b']}> gae."
+	await ctx.send(content=cnt)
+	await guild(ctx)
 
 @bot.command( name='hello', aliases=['hi'], description="Greet user with Hello!" )
 async def bot_greet(ctx):

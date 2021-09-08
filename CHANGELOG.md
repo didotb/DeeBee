@@ -26,6 +26,10 @@
 + **0.2**: added SimpleLogin module pointing to Discord WebHook form
 + **0.3**: added URL redirection
 + **0.4**: migrated all redirect to [reloc.tk](https://www.reloc.tk/ "https://www.reloc.tk/")
+#
+### Virus Scanning
+A Passive virus scan with the help of VirusTotal API. Alerts the channel if and only if an attachment or link has/is a malware.
++ To do
 
 #
 #
@@ -34,7 +38,9 @@
 ### Currently Doing
 + nothing yet
 ### To Do
-+ nothing yet
++ Create Application Commands (A.K.A Slash Commands)
++ Implement attachment virus scanning with VirusTotal API
+  + Additionally, Link malware scanning
 # 
 ### Halted
 + Integrate Himawari-8 weather images
