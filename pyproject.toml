@@ -16,6 +16,7 @@ pytz = "^2021.1"
 flask-simplelogin = "^0.0.7"
 wget = "^3.2"
 discord-py-interactions = "^3.0.2"
+vt-py = "^0.7.2"
 
 [tool.poetry.dev-dependencies]
 

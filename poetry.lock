@@ -270,6 +270,20 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "vt-py"
+version = "0.7.2"
+description = "The official Python client library for VirusTotal"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[package.dependencies]
+aiohttp = "*"
+
+[package.extras]
+test = ["pytest", "pytest-httpserver", "pytest-asyncio"]
+
+[[package]]
 name = "werkzeug"
 version = "1.0.1"
 description = "The comprehensive WSGI web application library."
@@ -320,7 +334,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "28431586e7d22b4c6ecfd62a60425f57afb1e06ae074fd1a9439754daf6dca40"
+content-hash = "d08a6d39f668f9f379394fed8d16335027486f9e19a40bb706632d9390f7b325"
 
 [metadata.files]
 aiohttp = [
@@ -540,6 +554,10 @@ typing-extensions = [
     {file = "typing_extensions-3.10.0.2-py2-none-any.whl", hash = "sha256:d8226d10bc02a29bcc81df19a26e56a9647f8b0a6d4a83924139f4a8b01f17b7"},
     {file = "typing_extensions-3.10.0.2-py3-none-any.whl", hash = "sha256:f1d25edafde516b146ecd0613dabcc61409817af4766fbbcfb8d1ad4ec441a34"},
     {file = "typing_extensions-3.10.0.2.tar.gz", hash = "sha256:49f75d16ff11f1cd258e1b988ccff82a3ca5570217d7ad8c5f48205dd99a677e"},
+]
+vt-py = [
+    {file = "vt-py-0.7.2.tar.gz", hash = "sha256:e1adfcb54b4ff3e86456b8a551827702650e25469e9d99bf030b71d564358b1d"},
+    {file = "vt_py-0.7.2-py3-none-any.whl", hash = "sha256:df9adb0ff949bd2504b37a0f51ee9820eb6bee6e5d01e108b8ce0bec1c678df9"},
 ]
 werkzeug = [
     {file = "Werkzeug-1.0.1-py2.py3-none-any.whl", hash = "sha256:2de2a5db0baeae7b2d2664949077c2ac63fbd16d98da0ff71837f7d1dea3fd43"},

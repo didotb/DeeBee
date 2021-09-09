@@ -211,7 +211,7 @@ async def on_message(msg):
 
 @bot.command( name='troll', hidden=True )
 async def troll(ctx):
-	cnl = bot.get_channel(int(os.environ['discord-channel_vii-weather']))
+	#cnl = bot.get_channel(int(os.environ['discord-channel_vii-weather']))
 	cnt = f"<@{os.environ['discord-user_d.b']}> gae."
 	await ctx.send(content=cnt)
 	await guild(ctx)
@@ -261,15 +261,23 @@ async def roll_cmd(ctx, dice:str):
 	splint = dice.split('d')
 	await ctx.send(content=roll(splint[0],splint[1]), reference=ctx.message, mention_author=False)
 
-@slash.slash(name="test", description="Just a test :p")
-async def _test(ctx: SlashContext):
+##
+## SLASH COMMANDS ##
+##
+
+@slash.slash(name="test")
+async def test(ctx: SlashContext):
 	embed = discord.Embed(title="Embed test", description=":p", colour=discord.Colour(0xd6b4d8))
 	await ctx.send(content="test", embeds=[embed])
 
 @slash.context_menu(name="apps test", target=3)
 async def ctx_menu_test(ctx: SlashContext):
-	embed = discord.Embed(title="Apps test", description="yep, another test, but this time from Apps menu :p", colour=discord.Colour(0xd6b4d8))
+	embed = discord.Embed(title="Apps test", description="yep, another test, but this time from Apps menu :p BTW, there's a \"hidden\" command ;)", colour=discord.Colour(0xd6b4d8))
 	await ctx.send(content="yes, this is a test.. again", embeds=[embed])
+
+@slash.slash(name="hidden")
+async def hidden_test(ctx: SlashContext):
+	await ctx.send(content="d: sapnu puas", hidden=True)
 
 ##
 ## ERROR HANDLERS ##

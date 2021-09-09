@@ -38,7 +38,9 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ sleep
++ Figure out how to make discord file attachment link readable by VirusTotal
++ Get discord file attachment hashes
+  + Submit the file hashes to VirusTotal
 ### To Do
 ###### **_Expand items on To Do list. Be more concise._**
 + Implement attachment virus scanning with VirusTotal API
