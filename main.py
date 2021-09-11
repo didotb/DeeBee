@@ -34,7 +34,7 @@ def emote(animated, emojiName):
 			if eName in j.lower() and '<a:' not in j.lower():
 				return j
 		else:
-			return "argument: `animated` is missing."
+			return "Argument `animated` is missing."
 	if animated == False:
 		return "`Error retrieving emote. Check name or spelling.`"
 	elif animated == True:

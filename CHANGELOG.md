@@ -38,8 +38,8 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ **Too tired for now.. Let me do htis later.**
-+ ~~Figure out how to make discord file attachment link readable by VirusTotal~~
++ ~~**Too tired for now.. Let me do htis later.**~~
++ Figure out how to make discord file attachment link readable by VirusTotal
 + ~~Get discord file attachment hashes~~
   + ~~Submit the file hashes to VirusTotal~~
 ### To Do
