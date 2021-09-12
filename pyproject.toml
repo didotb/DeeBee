@@ -17,6 +17,7 @@ flask-simplelogin = "^0.0.7"
 wget = "^3.2"
 discord-py-interactions = "^3.0.2"
 vt-py = "^0.7.2"
+virustotal3 = "^1.0.8"
 
 [tool.poetry.dev-dependencies]
 
