@@ -32,6 +32,7 @@
 A Passive virus scan with the help of VirusTotal API. Alerts the channel if and only if an attachment or link has/is a malware.
 + To do
 + Development links: [Official VirusTotal API for Python](https://github.com/VirusTotal/vt-py/ "vt-py")
++ **0.1**: added file scanning
 
 #
 #
