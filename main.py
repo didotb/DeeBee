@@ -1,6 +1,6 @@
 import discord, os, asyncio, pytz, datetime, random, sys
 from discord.ext import commands, tasks
-from discord_slash import SlashCommand, SlashContext
+from discord_slash import SlashCommand, SlashContext, MenuContext
 try:
 	import weather
 except:
@@ -21,7 +21,7 @@ msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
 bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
-slash = SlashCommand(bot, sync_commands=True)
+slash = SlashCommand(bot)
 
 def emote(animated, emojiName):
 	eName = emojiName.lower()
@@ -70,7 +70,7 @@ async def bot_startled(author:str):
 		return 'eyy <@' + author + '>! what\'s up'
 	else:
 		await debug(msg='author id: ' + author)
-		return 'Command has broken, check debug channel, and console.'
+		return 'Command broke, check debug channel, and console.'
 
 async def debug( msg:str = None, pre_msg:int = None, cid:int = int( os.environ[ 'discord-channel_debug' ] ) ):
 	if pre_msg is not None:
@@ -91,6 +91,31 @@ async def debug( msg:str = None, pre_msg:int = None, cid:int = int( os.environ[ 
 	ts = datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '(%b %d, %Y - %X): ' )
 	await channel.send( "`" + ts + message + "`" )
 	return
+
+## 
+## SCHEDULERS ##
+##
+
+@tasks.loop( hours=24 )
+async def xmas():
+	now = datetime.date.today()
+	xmasd = datetime.date(2021,12,25)
+	date_left = xmasd - now
+	days_left = int( date_left.days ) - 1
+	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
+	print( "xmas message sent" )
+	await cnl.send(f"@everyone! {days_left} days left before christmas!\nblame <@{os.environ['discord-user_vii']}>")
+
+@xmas.before_loop
+async def before_xmas():
+	hours = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone('Asia/Manila') ).strftime('%H') )
+	minutes = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone('Asia/Manila') ).strftime('%M') )
+	seconds = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone('Asia/Manila') ).strftime('%S') )
+	wait = 86400 - ( ( ( hours * 60 ) + minutes ) * 60 + seconds )
+	print( "waiting to get ready" )
+	print( wait )
+	await asyncio.sleep( wait )
+	await bot.wait_until_ready()
 
 if 'weather' in sys.modules:
 	@tasks.loop( hours=1 )
@@ -128,7 +153,7 @@ if 'weather' in sys.modules:
 
 @bot.event
 async def on_ready():
-	print('logged in as {0.user}'.format(bot))
+	print(f'logged in as {bot.user}')
 
 	name = "db help"
 	act = discord.ActivityType.listening
@@ -198,7 +223,11 @@ async def on_message(msg):
 		if not msg.attachments:
 			await channel.send(content=details)
 
-	if msg.channel.id == int(os.environ['discord-channel_beaneyboo-announcement']):
+	if msg.channel.id in [int(os.environ['discord-channel_beaneyboo-announcement'])]:
+		await asyncio.sleep(3)
+		await msg.publish()
+
+	if ((msg.channel.id == int(os.environ['discord-channel_vii-weather'])) and (msg.attachments)) or (msg.channel.id == int(os.environ['discord-channel_vii_days-before-xmas'])):
 		await asyncio.sleep(3)
 		await msg.publish()
 
@@ -279,6 +308,11 @@ async def ctx_menu_test(ctx: SlashContext):
 async def hidden_test(ctx: SlashContext):
 	await ctx.send(content="d: sapnu puas", hidden=True)
 
+@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_db-server'])])
+async def context_test(ctx: MenuContext):
+	print( ctx.data )
+	await ctx.send("check console", hidden=True)
+
 ##
 ## ERROR HANDLERS ##
 ##
@@ -296,6 +330,7 @@ async def send_emote_error(ctx, error):
 
 if 'weather' in sys.modules:
 	sched_weather.start()
+xmas.start()
 if 'keep_alive' in sys.modules:
 	keep_alive()
 bot.run(os.getenv( 'TOKEN' ))
