@@ -104,7 +104,7 @@ async def xmas():
 	days_left = int( date_left.days ) - 1
 	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
 	print( "xmas message sent" )
-	await cnl.send(f"@everyone! {days_left} days left before christmas!\nblame <@{os.environ['discord-user_vii']}>")
+	await cnl.send(f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas.")
 
 @xmas.before_loop
 async def before_xmas():
@@ -170,6 +170,10 @@ async def on_message(msg):
 	mTrig = (cont for cont in msgCont if cont in msgTrig)
 	mYep = (cont for cont in msgCont if cont in msgYEP)
 
+	if (msg.author == bot.user) and ((msg.channel.id == int(os.environ['discord-channel_vii-weather']) and msg.attachments)) or (msg.channel.id == int(os.environ['discord-channel_vii_days-before-xmas'])):
+		await asyncio.sleep(3)
+		await msg.publish()
+
 	# if message author is itself or another bot, ignore it
 	if msg.author == bot.user or msg.author.bot:
 		return
@@ -224,10 +228,6 @@ async def on_message(msg):
 			await channel.send(content=details)
 
 	if msg.channel.id in [int(os.environ['discord-channel_beaneyboo-announcement'])]:
-		await asyncio.sleep(3)
-		await msg.publish()
-
-	if ((msg.channel.id == int(os.environ['discord-channel_vii-weather'])) and (msg.attachments)) or (msg.channel.id == int(os.environ['discord-channel_vii_days-before-xmas'])):
 		await asyncio.sleep(3)
 		await msg.publish()
 
