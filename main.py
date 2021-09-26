@@ -145,6 +145,11 @@ if 'weather' in sys.modules:
 
 	@sched_weather.before_loop
 	async def before():
+		if os.path.exists(weather.target):
+			await debug( msg = "Cleaning temporary files." )
+			weather.clean()
+			await debug( msg = "Done cleaning." )
+		await debug(msg="Waiting for next absolute hour before starting loop.")
 		minutes = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%M' ) )
 		seconds = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%S' ) )
 		wait = 3600 - ( ( ( minutes + 1 ) * 60 ) + ( seconds - 30 ) )
