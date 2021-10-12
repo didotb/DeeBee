@@ -218,6 +218,16 @@ async def on_message(msg):
 			channel = bot.get_channel(int(os.environ['discord-channel_text-archive']))
 			await channel.send(content=details)
 
+	if msg.guild.id == int(os.environ['discord-guild_foxy-server']):
+		channel = bot.get_channel(int(os.environ['discord-channel_foxy-archive']))
+		details = '`'+ str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) )) +'`\n# Author: `'+ msg.author.name +'` Channel Name: `'+ msg.channel.name +'`\n'+ msg.content
+		if msg.attachments:
+			for i in msg.attachments:
+				att = await i.to_file()
+				await channel.send(content=details, file=att)
+		if not msg.attachments:
+			await channel.send(content=details)
+
 	if msg.guild.id == int(os.environ['discord-guild_beaneyboo-server']) and (msg.channel.id != int(os.environ['discord-channel_beaneyboo-mods-priv']) and msg.channel.id != int(os.environ['discord-channel_beaneyboo-moderator-only']) and msg.channel.id != int(os.environ['discord-channel_beaneyboo-msg-archiving'])):
 		channel = bot.get_channel(int(os.environ['discord-channel_beaneyboo-msg-archiving']))
 		details = '`'+ str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) )) +'`\n# Author: `'+ msg.author.name +'` Channel Name: `'+ msg.channel.name +'`\n'+ msg.content
