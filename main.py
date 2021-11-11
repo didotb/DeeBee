@@ -40,9 +40,9 @@ def emote(animated, emojiName):
 	elif animated == True:
 		return "`Error retriving animated emote. Check name or spelling.`"
 
+# wrote this brain dead
 def roll(start, stop):
-	if start == '':
-		start = 1
+	start = start if start else 1
 	if stop == '':
 		return 'Error in command argument. -> second argument is empty.'
 	try:
@@ -103,8 +103,8 @@ async def xmas():
 	date_left = xmasd - now
 	days_left = int( date_left.days ) - 1
 	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
-	print( "xmas message sent" )
-	await cnl.send(f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas.")
+	msg = f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas." if days_left > 35 else f"@everyone ! {days_left} days left before christmas! LEZGOOO ! !"
+	await cnl.send(msg)
 
 @xmas.before_loop
 async def before_xmas():

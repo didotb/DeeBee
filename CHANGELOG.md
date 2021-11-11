@@ -11,6 +11,8 @@
 + **1.2**: changed how message reaction worked
 + **1.2_01**: made `weather`, and `keep_alive` modules optional
 + **1.3**: added Discord Interactions
++ **1.3_01**: added `days-before-xmas` daily countdown till christmas
++ **1.3_02**: added if-else for `days-before-xmas` for less than or equal to 35 days
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
@@ -39,9 +41,8 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ ~~**Too tired for now.. Let me do htis later.**~~
-+ Main Mission: I need context! - Find out how SlashContext works.
-+ Figure out how to make discord file attachment link readable by VirusTotal
++ ~~Main Mission: I need context! - Find out how SlashContext works.~~
++ ~~Figure out how to make discord file attachment link readable by VirusTotal~~
 + ~~Get discord file attachment hashes~~
   + ~~Submit the file hashes to VirusTotal~~
 ### To Do
