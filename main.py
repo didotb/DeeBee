@@ -103,7 +103,7 @@ async def xmas():
 	date_left = xmasd - now
 	days_left = int( date_left.days ) - 1
 	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
-	msg = f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas." if days_left > 35 else f"@everyone ! {days_left} days left before christmas! LEZGOOO ! !"
+	msg = f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas." if days_left > 40 else f"@everyone ! {days_left} days left before christmas! LEZGOOO ! !"
 	await cnl.send(msg)
 
 @xmas.before_loop
