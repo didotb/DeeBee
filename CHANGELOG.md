@@ -13,6 +13,7 @@
 + **1.3**: added Discord Interactions
 + **1.3_01**: added `days-before-xmas` daily countdown till christmas
 + **1.3_02**: added if-else for `days-before-xmas` for less than or equal to 35 days
++ **1.3_03**: added general `ext.commands` error handler
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
@@ -29,6 +30,7 @@
 + **0.2**: added SimpleLogin module pointing to Discord WebHook form
 + **0.3**: added URL redirection
 + **0.4**: migrated all redirect to [reloc.tk](https://www.reloc.tk/ "https://www.reloc.tk/")
++ **1.0**: site shows simple page to invite bot
 #
 ### Virus Scanning
 A Passive virus scan with the help of VirusTotal API. Alerts the channel if and only if an attachment or link has/is a malware.

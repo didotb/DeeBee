@@ -12,11 +12,11 @@ except:
 	print( "keep_alive.py is missing. Although optional, UptimeRobot will not be able to monitor bot uptime status." )
 	pass
 
-listener = "db ", "deebee "
+listener = "db ", "deebee ", "DB ", "DEEBEE ", "Db ", "DeeBee "
 greeting = ['hello', 'hi']
 positive = ['true', 't']
 negative = ['false', 'f']
-mf = ['motherfucker', 'modafaka', 'motherfuka', 'madafaka']
+mf = ['motherfucker', 'modafaka', 'motherfuka', 'madafaka', 'mdfk', 'mfkr']
 msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
@@ -103,7 +103,18 @@ async def xmas():
 	date_left = xmasd - now
 	days_left = int( date_left.days ) - 1
 	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
-	msg = f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas." if days_left > 40 else f"@everyone ! {days_left} days left before christmas! LEZGOOO ! !"
+	msgs = [
+		"Do you think snow is God's cum?",
+		"#DixoutForSanta this xmas.",
+		"Can't wait for Santa porn this xmas.",
+		"Dad, I've been working, where's my money?",
+		"Imagine Gnomes with Dwarfism.",
+		"Subscribe to my OnlyFans: https://reloc.tk/deebee-onlyfans/",
+		"Santa is like 2021 years old right?",
+		"Somebody remind Santa his face shield.",
+		"I can speak many languages! Estás usando este software de traducción de forma incorrecta. Por favor, consulta el manual."
+	]
+	msg = f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas." if (days_left > 40) else f"@everyone! {random.choice(msgs)} Anyway, {days_left} days left before christmas!"
 	await cnl.send(msg)
 
 @xmas.before_loop
@@ -156,7 +167,7 @@ if 'weather' in sys.modules:
 async def on_ready():
 	print(f'logged in as {bot.user}')
 
-	name = "db help"
+	name = "\'db help\'"
 	act = discord.ActivityType.listening
 
 	activity = discord.Activity( name=name, details='Testing', type=act )
@@ -208,35 +219,33 @@ async def on_message(msg):
 		await msg.channel.send(content=emote(False, "mmmseks") + emote(False, "mmmseks") + emote(False, "mmmseks"), reference=msg, mention_author=True)
 		await msg.add_reaction(emoji=emote(False, "mmmseks"))
 
+	details = f"```{str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ))}\n# Author: {msg.author.name}\n# Server Name: {msg.guild.name}\n# Channel Name: {msg.channel.name}\n\n{msg.content}```"
 	if msg.guild.id != int(os.environ['discord-guild_migs-server']) and msg.guild.id != int(os.environ['discord-guild_beaneyboo-server']) and msg.guild.id != int(os.environ['discord-guild_db-server']):
-		details = '`'+ str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) )) +'`\n# Author: `'+ msg.author.name +'`\n# Server Name: `'+ msg.guild.name +'`\n# Channel Name: `'+ msg.channel.name +'`\n'+ msg.content
 		if msg.attachments:
 			channel = bot.get_channel(int(os.environ['discord-channel_images-archive']))
 			for i in msg.attachments:
-				await channel.send(content=details, file=await i.to_file())
+				await channel.send(details, file=await i.to_file())
 		if not msg.attachments:
 			channel = bot.get_channel(int(os.environ['discord-channel_text-archive']))
-			await channel.send(content=details)
+			await channel.send(details)
 
 	if msg.guild.id == int(os.environ['discord-guild_foxy-server']):
 		channel = bot.get_channel(int(os.environ['discord-channel_foxy-archive']))
-		details = '`'+ str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) )) +'`\n# Author: `'+ msg.author.name +'` Channel Name: `'+ msg.channel.name +'`\n'+ msg.content
 		if msg.attachments:
 			for i in msg.attachments:
 				att = await i.to_file()
-				await channel.send(content=details, file=att)
+				await channel.send(details, file=att)
 		if not msg.attachments:
-			await channel.send(content=details)
+			await channel.send(details)
 
 	if msg.guild.id == int(os.environ['discord-guild_beaneyboo-server']) and (msg.channel.id != int(os.environ['discord-channel_beaneyboo-mods-priv']) and msg.channel.id != int(os.environ['discord-channel_beaneyboo-moderator-only']) and msg.channel.id != int(os.environ['discord-channel_beaneyboo-msg-archiving'])):
 		channel = bot.get_channel(int(os.environ['discord-channel_beaneyboo-msg-archiving']))
-		details = '`'+ str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) )) +'`\n# Author: `'+ msg.author.name +'` Channel Name: `'+ msg.channel.name +'`\n'+ msg.content
 		if msg.attachments:
 			for i in msg.attachments:
 				att = await i.to_file()
-				await channel.send(content=details, file=att)
+				await channel.send(details, file=att)
 		if not msg.attachments:
-			await channel.send(content=details)
+			await channel.send(details)
 
 	if msg.channel.id in [int(os.environ['discord-channel_beaneyboo-announcement'])]:
 		await asyncio.sleep(3)
@@ -325,15 +334,21 @@ async def context_test(ctx: MenuContext):
 	await ctx.send("check console", hidden=True)
 
 ##
-## ERROR HANDLERS ##
+## ERROR HANDLER(S) ##
 ##
 
-@send_emote.error
-async def send_emote_error(ctx, error):
-	if isinstance( error, commands.MissingRequiredArgument ):
-		await ctx.send( content = '`' + str(error) + ' Try db help emote for help`', delete_after=5.0, reference=ctx.message, mention_author = True )
-	if isinstance( error, commands.BadBoolArgument ):
-		await ctx.send( content = '`' + str(error) + '`', delete_after=5.0, reference=ctx.message, mention_author = True )
+@bot.event
+async def on_command_error(ctx, error):
+	bad_cmd = (commands.MissingRequiredArgument, commands.BadArgument, commands.BadBoolArgument, commands.TooManyArguments)
+
+	if isinstance(error, commands.CommandNotFound):
+		await ctx.send( f"`{error}`", delete_after=5.0, reference=ctx.message, mention_author=False )
+	elif isinstance(error, commands.MissingPermissions):
+		await ctx.send("You do not have permission to use this command.", delete_after=5.0, reference=ctx.message, mention_author=True)
+	elif isinstance(error, bad_cmd):
+		await ctx.send(f"`Usage: {ctx.command} {ctx.command.signature}`", delete_after=15.0, reference=ctx.message, mention_author=False)
+	else:
+		await ctx.send(f"```General ext.commands error.\nCommand used: {ctx.command}\nEntire Message: {ctx.message.content}```")
 
 ###
 ### RUN EVERYTHING ###

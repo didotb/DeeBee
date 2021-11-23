@@ -15,6 +15,8 @@ app.config[ 'SIMPLELOGIN_HOME_URL' ] = '/2021/05/15/' + r(5) + '/' + r() + '/'
 app.config[ 'SIMPLELOGIN_LOGIN_URL' ] = '/login/'
 app.config[ 'SIMPLELOGIN_LOGOUT_URL' ] = '/logout/'
 
+invite_link = "https://discord.com/api/oauth2/authorize?client_id=766464267720458310&permissions=8&redirect_uri=https%3A%2F%2Fbot.ddotb.tk%2Fdeebee%2F&scope=applications.commands%20bot"
+
 def check( user ):
 	if ( user.get( 'username' ) == os.environ[ 'FLASK_USER' ] ) and ( ( h.sha256( os.environ[ 'FLASK_S1' ].encode() + user.get( 'password' ).encode() + os.environ[ 'FLASK_S2' ].encode() ).hexdigest() ) == os.environ[ 'FLASK_PWD' ] ):
 		return True
@@ -28,7 +30,7 @@ def home():
 	header = 'full header request: ' + str( request.headers )
 	with open( 'flask.log', 'a' ) as file:
 		file.write( dt + ip + ' ' + browser + '\n' + header )'''
-	return redirect( "https://stat.ddotb.tk/" )
+	return f"<a href='{invite_link}'>Invite DeeBee Bot</a><br><br>Permissions:\n<ul>&bull;&emsp;Administrator (Optional)</ul><ul>&bull;&emsp;Slash Commands</ul>"
 
 @app.route( '/hook/' )
 def hook_redirect():
@@ -38,7 +40,7 @@ def hook_redirect():
 
 @app.route( '/add/' )
 def add_bot():
-	return redirect( "https://discord.com/api/oauth2/authorize?client_id=766464267720458310&permissions=8&redirect_uri=https%3A%2F%2Fbot.ddotb.tk%2Fdeebee%2F&scope=applications.commands%20bot" )
+	return redirect( invite_link )
 
 @app.route( '/deebee/' )
 def bot_oauth2():
