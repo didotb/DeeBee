@@ -13,7 +13,8 @@
 + **1.3**: added Discord Interactions
 + **1.3_01**: added `days-before-xmas` daily countdown till christmas
 + **1.3_02**: added if-else for `days-before-xmas` for less than or equal to 35 days
-+ **1.3_03**: added general `ext.commands` error handler
++ **1.3_03**: added `ext.commands` error handlers
++ **1.3_04**: major overhaul to the `roll` command
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video

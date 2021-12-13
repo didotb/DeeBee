@@ -1,4 +1,5 @@
-import discord, os, asyncio, pytz, datetime, random, sys
+import discord, os, asyncio, pytz, datetime, random, sys, re
+from collections import deque
 from discord.ext import commands, tasks
 from discord_slash import SlashCommand, SlashContext, MenuContext
 try:
@@ -20,6 +21,18 @@ mf = ['motherfucker', 'modafaka', 'motherfuka', 'madafaka', 'mdfk', 'mfkr']
 msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
+dicelist = {'d','r'}
+msgs = [
+		"#DixoutForSanta this xmas.",
+		"Can't wait for Santa porn this xmas.",
+		"Tell Ddot to give me money, I need more memory.",
+		"Imagine Gnomes with Dwarfism.",
+		"Santa is like 2021 years old right?",
+		"Somebody remind Santa his face shield.",
+		"I can speak many languages! Estás usando este software de traducción de forma incorrecta. Por favor, consulta el manual.",
+		"I wonder if ancient Egyptian people tried to turn a cat into a Pharaoh, but it failed so they made their human Pharaohs look like cats instead.\nI wonder if Pharaohs meow to their cats.",
+		"Imagine having a butthole, but one day it sealed itself."
+	]
 bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
 slash = SlashCommand(bot)
 
@@ -40,28 +53,17 @@ def emote(animated, emojiName):
 	elif animated == True:
 		return "`Error retriving animated emote. Check name or spelling.`"
 
-# wrote this brain dead
-def roll(start, stop):
-	start = start if start else 1
-	if stop == '':
-		return 'Error in command argument. -> second argument is empty.'
-	try:
-		fi = int(start)
-	except ValueError:
-		return 'Error in command argument. -> '+start+' is not a valid integer.'
-	try:
-		si = int(stop)
-	except ValueError:
-		return 'Error in command argument. -> '+stop+' is not a valid integer.'
+# actually fixed this using RegEx
+def roll(start:int, kind:str=None, stop:int=None):
 	out:int = 0
-	if fi <= 0 or si <= 0:
+	if start <= 0 or stop <= 0:
 		return 'Cannot roll ' +start+ ' amount of dice with '+stop+' amount of sides.'
-	if fi <= 9999:
-		for i in range(1,fi+1):
-			out:int = out + random.randint(1,si)
+	if start <= 9999:
+		for i in range(1,start+1):
+			out:int = out + random.randint(1,stop)
 		return out
 	else:
-		return 'Not enough memory. -> '+str(fi)
+		return f'Not enough memory to calculate {str(start)} amount of dice.'
 
 async def bot_startled(author:str):
 	if author != os.environ['discord-user_d.b']:
@@ -103,19 +105,11 @@ async def xmas():
 	date_left = xmasd - now
 	days_left = int( date_left.days ) - 1
 	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
-	msgs = [
-		"Do you think snow is God's cum?",
-		"#DixoutForSanta this xmas.",
-		"Can't wait for Santa porn this xmas.",
-		"Dad, I've been working, where's my money?",
-		"Imagine Gnomes with Dwarfism.",
-		"Subscribe to my OnlyFans: https://reloc.tk/deebee-onlyfans/",
-		"Santa is like 2021 years old right?",
-		"Somebody remind Santa his face shield.",
-		"I can speak many languages! Estás usando este software de traducción de forma incorrecta. Por favor, consulta el manual."
-	]
-	msg = f"@everyone! {days_left} days left before christmas!\ncause <@{os.environ['discord-user_vii']}> is too excited for xmas." if (days_left > 40) else f"@everyone! {random.choice(msgs)} Anyway, {days_left} days left before christmas!"
-	await cnl.send(msg)
+	if days_left >= 0:
+		msg = f"@here! {random.choice(msgs)} Anyway, {days_left} days left before christmas!" if (days_left > 0) else f"@everyone! MERRY CHRISTMAS! Hope you have a wonderful day!"
+		await cnl.send(msg)
+	else:
+		pass
 
 @xmas.before_loop
 async def before_xmas():
@@ -306,9 +300,19 @@ async def bitch_react(ctx):
 	await ctx.send(content=await bot_startled(str(ctx.author.id)), reference=ctx.message, mention_author=False)
 
 @bot.command( name='roll', description="Roll a dice." )
-async def roll_cmd(ctx, dice:str):
-	splint = dice.split('d')
-	await ctx.send(content=roll(splint[0],splint[1]), reference=ctx.message, mention_author=False)
+async def roll_cmd(ctx, dice_notation:str):
+	dice = dice_notation.lower()
+	try:
+		divd = deque([int(temp) if temp.isdigit() else temp for temp in re.match(r'([a-z]+)([0-9]+)',dice).groups()])
+		divd.appendleft(1)
+	except AttributeError:
+		try:
+			divd = deque([int(temp) if temp.isdigit() else temp for temp in re.match(r'([0-9]+)([a-z]+)([0-9]+)',dice).groups()])
+		except AttributeError:
+			raise commands.BadArgument("BadArgument: Invalid input.\nUse simple dice notation. Algebraic expressions not yet supported.")
+	if divd[1] not in dicelist:
+		raise commands.BadArgument(f"BadArgument: Invalid dice type.\n\'{divd[1]}\' is not a valid type of dice.")
+	await ctx.send(content=roll(divd[0],divd[1],divd[2]), reference=ctx.message, mention_author=False)
 
 ##
 ## SLASH COMMANDS ##
@@ -346,9 +350,9 @@ async def on_command_error(ctx, error):
 	elif isinstance(error, commands.MissingPermissions):
 		await ctx.send("You do not have permission to use this command.", delete_after=5.0, reference=ctx.message, mention_author=True)
 	elif isinstance(error, bad_cmd):
-		await ctx.send(f"`Usage: {ctx.command} {ctx.command.signature}`", delete_after=15.0, reference=ctx.message, mention_author=False)
+		await ctx.send(f"```Error in command\n{error}\n\nUsage: {ctx.command} {ctx.command.signature}```", delete_after=15.0, reference=ctx.message, mention_author=False)
 	else:
-		await ctx.send(f"```General ext.commands error.\nCommand used: {ctx.command}\nEntire Message: {ctx.message.content}```")
+		await ctx.send(f"```General ext.commands error\n{error}\nCommand used: {ctx.command}\nEntire Message: {ctx.message.content}```", delete_after=15.0, reference=ctx.message, mention_author=False)
 
 ###
 ### RUN EVERYTHING ###
