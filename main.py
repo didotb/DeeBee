@@ -13,7 +13,7 @@ except:
 	print( "keep_alive.py is missing. Although optional, UptimeRobot will not be able to monitor bot uptime status." )
 	pass
 
-listener = "db ", "deebee ", "DB ", "DEEBEE ", "Db ", "DeeBee "
+listener = "db ", "deebee ", "DB ", "DEEBEE ", "Db ", "DeeBee ", "Deebee "
 greeting = ['hello', 'hi']
 positive = ['true', 't']
 negative = ['false', 'f']
@@ -22,17 +22,6 @@ msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
 dicelist = {'d','r'}
-msgs = [
-		"#DixoutForSanta this xmas.",
-		"Can't wait for Santa porn this xmas.",
-		"Tell Ddot to give me money, I need more memory.",
-		"Imagine Gnomes with Dwarfism.",
-		"Santa is like 2021 years old right?",
-		"Somebody remind Santa his face shield.",
-		"I can speak many languages! Estás usando este software de traducción de forma incorrecta. Por favor, consulta el manual.",
-		"I wonder if ancient Egyptian people tried to turn a cat into a Pharaoh, but it failed so they made their human Pharaohs look like cats instead.\nI wonder if Pharaohs meow to their cats.",
-		"Imagine having a butthole, but one day it sealed itself."
-	]
 bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
 slash = SlashCommand(bot)
 
@@ -58,12 +47,17 @@ def roll(start:int, kind:str=None, stop:int=None):
 	out:int = 0
 	if start <= 0 or stop <= 0:
 		return 'Cannot roll ' +start+ ' amount of dice with '+stop+' amount of sides.'
-	if start <= 9999:
-		for i in range(1,start+1):
-			out:int = out + random.randint(1,stop)
-		return out
-	else:
-		return f'Not enough memory to calculate {str(start)} amount of dice.'
+	if kind is None:
+		return f'Invalid input: missing argument \'kind\''
+	elif kind == 'd':
+		if start <= 9999:
+			for i in range(1,start+1):
+				out:int = out + random.randint(1,stop)
+			return out
+		else:
+			return f'Not enough memory to calculate {str(start)} amount of dice.'
+	#elif kind == 'r':
+		# insert stuff later
 
 async def bot_startled(author:str):
 	if author != os.environ['discord-user_d.b']:
@@ -97,30 +91,6 @@ async def debug( msg:str = None, pre_msg:int = None, cid:int = int( os.environ[ 
 ## 
 ## SCHEDULERS ##
 ##
-
-@tasks.loop( hours=24 )
-async def xmas():
-	now = datetime.date.today()
-	xmasd = datetime.date(2021,12,25)
-	date_left = xmasd - now
-	days_left = int( date_left.days ) - 1
-	cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
-	if days_left >= 0:
-		msg = f"@here! {random.choice(msgs)} Anyway, {days_left} days left before christmas!" if (days_left > 0) else f"@everyone! MERRY CHRISTMAS! Hope you have a wonderful day!"
-		await cnl.send(msg)
-	else:
-		pass
-
-@xmas.before_loop
-async def before_xmas():
-	hours = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone('Asia/Manila') ).strftime('%H') )
-	minutes = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone('Asia/Manila') ).strftime('%M') )
-	seconds = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone('Asia/Manila') ).strftime('%S') )
-	wait = 86400 - ( ( ( hours * 60 ) + minutes ) * 60 + seconds )
-	print( "waiting to get ready" )
-	print( wait )
-	await asyncio.sleep( wait )
-	await bot.wait_until_ready()
 
 if 'weather' in sys.modules:
 	@tasks.loop( hours=1 )
@@ -254,10 +224,9 @@ async def on_message(msg):
 
 @bot.command( name='troll', hidden=True )
 async def troll(ctx):
-	#cnl = bot.get_channel(int(os.environ['discord-channel_vii-weather']))
-	cnt = f"<@{os.environ['discord-user_d.b']}> gae."
-	await ctx.send(content=cnt)
-	await guild(ctx)
+	#cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
+	msg = f"<@{os.environ['discord-user_d.b']}> gae."
+	await ctx.send(content=msg)
 
 @bot.command( name='hello', aliases=['hi'], description="Greet user with Hello!" )
 async def bot_greet(ctx):
@@ -309,7 +278,7 @@ async def roll_cmd(ctx, dice_notation:str):
 		try:
 			divd = deque([int(temp) if temp.isdigit() else temp for temp in re.match(r'([0-9]+)([a-z]+)([0-9]+)',dice).groups()])
 		except AttributeError:
-			raise commands.BadArgument("BadArgument: Invalid input.\nUse simple dice notation. Algebraic expressions not yet supported.")
+			raise commands.BadArgument("Bad argument: Invalid input.\nUse simple dice notation. Algebraic expressions not yet supported.")
 	if divd[1] not in dicelist:
 		raise commands.BadArgument(f"BadArgument: Invalid dice type.\n\'{divd[1]}\' is not a valid type of dice.")
 	await ctx.send(content=roll(divd[0],divd[1],divd[2]), reference=ctx.message, mention_author=False)
@@ -350,9 +319,19 @@ async def on_command_error(ctx, error):
 	elif isinstance(error, commands.MissingPermissions):
 		await ctx.send("You do not have permission to use this command.", delete_after=5.0, reference=ctx.message, mention_author=True)
 	elif isinstance(error, bad_cmd):
-		await ctx.send(f"```Error in command\n{error}\n\nUsage: {ctx.command} {ctx.command.signature}```", delete_after=15.0, reference=ctx.message, mention_author=False)
+		await ctx.send(f"""```md
+Error in command
+{error}
+# Message will delete after 15 seconds.
+
+<Usage: {ctx.command} {ctx.command.signature}>
+```""", delete_after=15.0, reference=ctx.message, mention_author=False)
 	else:
-		await ctx.send(f"```General ext.commands error\n{error}\nCommand used: {ctx.command}\nEntire Message: {ctx.message.content}```", delete_after=15.0, reference=ctx.message, mention_author=False)
+		await ctx.send(f"""```md
+General ext.commands error
+{error}
+<Command: {ctx.command}>
+<Message: {ctx.message.content}>```""", delete_after=15.0, reference=ctx.message, mention_author=False)
 
 ###
 ### RUN EVERYTHING ###
@@ -360,7 +339,6 @@ async def on_command_error(ctx, error):
 
 if 'weather' in sys.modules:
 	sched_weather.start()
-xmas.start()
 if 'keep_alive' in sys.modules:
 	keep_alive()
 bot.run(os.getenv( 'TOKEN' ))

@@ -15,6 +15,7 @@
 + **1.3_02**: added if-else for `days-before-xmas` for less than or equal to 35 days
 + **1.3_03**: added `ext.commands` error handlers
 + **1.3_04**: major overhaul to the `roll` command
++ **1.3_05**: reverted v1.3_01 after during Christmas 2021
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
