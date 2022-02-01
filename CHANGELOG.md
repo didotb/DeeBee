@@ -45,6 +45,7 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
++ Add discord together / voice chat activities
 + ~~Main Mission: I need context! - Find out how SlashContext works.~~
 + ~~Figure out how to make discord file attachment link readable by VirusTotal~~
 + ~~Get discord file attachment hashes~~
