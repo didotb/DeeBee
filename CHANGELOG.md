@@ -16,6 +16,7 @@
 + **1.3_03**: added `ext.commands` error handlers
 + **1.3_04**: major overhaul to the `roll` command
 + **1.3_05**: reverted v1.3_01 after during Christmas 2021
++ **1.4**: added Discord Together; temporarily removed Discord Interactions
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
@@ -45,8 +46,6 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ Add discord together / voice chat activities
-+ ~~Main Mission: I need context! - Find out how SlashContext works.~~
 + ~~Figure out how to make discord file attachment link readable by VirusTotal~~
 + ~~Get discord file attachment hashes~~
   + ~~Submit the file hashes to VirusTotal~~

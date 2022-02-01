@@ -1,7 +1,8 @@
 import discord, os, asyncio, pytz, datetime, random, sys, re
 from collections import deque
 from discord.ext import commands, tasks
-from discord_slash import SlashCommand, SlashContext, MenuContext
+from discord_together import DiscordTogether
+
 try:
 	import weather
 except:
@@ -23,7 +24,6 @@ msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
 dicelist = {'d','r'}
 bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
-slash = SlashCommand(bot)
 
 def emote(animated, emojiName):
 	eName = emojiName.lower()
@@ -137,6 +137,8 @@ async def on_ready():
 	activity = discord.Activity( name=name, details='Testing', type=act )
 	await bot.change_presence( activity=activity, status=discord.Status.online, afk=False )
 
+	bot.vca = await DiscordTogether(os.getenv( 'TOKEN' ))
+
 @bot.event
 async def on_message(msg):
 	msgCont = []
@@ -245,9 +247,9 @@ async def guild(ctx, channel_id:int=None):
 async def send_emote(ctx, name:str, animated:bool = False):
 	await ctx.send( emote( animated, name ) )
 
-@bot.command( name='sticker', enabled=False, hidden=True, description="Send any sticker from servers the bot is in." )
+'''@bot.command( name='sticker', enabled=False, hidden=True, description="Send any sticker from servers the bot is in." )
 async def send_sticker(ctx, name:str):
-	await ctx.send(  )
+	await ctx.send(  )'''
 
 @bot.command( name='weather', description="Send animated weather satelite images as mp4 video file." )
 async def send_weather(ctx):
@@ -268,6 +270,59 @@ async def send_weather(ctx):
 async def bitch_react(ctx):
 	await ctx.send(content=await bot_startled(str(ctx.author.id)), reference=ctx.message, mention_author=False)
 
+@bot.command( name='vca', aliases=['act', 'dt'], description='Start Discord Together / Voice Chat Activities' )
+async def vca(ctx, app='list'):
+	if app != 'list':
+		try:
+			vcid = ctx.author.voice.channel.id
+			valid_app = [['youtube', 'yt', 'wt'], ['poker', 'pn'], 'chess', 'betrayal', 'fishing', ['letter-league', 'lt'], ['word-snack', 'ws'], ['sketch-heads', 'sh'], ['spellcast', 'sc'], 'awkword', 'checkers']
+
+			if app in valid_app[0]:
+				vcal = await bot.vca.create_link(vcid, 'youtube')
+			elif app in valid_app[1]:
+				vcal = await bot.vca.create_link(vcid, 'poker')
+			elif app in valid_app[2]:
+				vcal = await bot.vca.create_link(vcid, 'chess')
+			elif app in valid_app[3]:
+				vcal = await bot.vca.create_link(vcid, 'betrayal')
+			elif app in valid_app[4]:
+				vcal = await bot.vca.create_link(vcid, 'fishing')
+			elif app in valid_app[5]:
+				vcal = await bot.vca.create_link(vcid, 'letter-league')
+			elif app in valid_app[6]:
+				vcal = await bot.vca.create_link(vcid, 'word-snack')
+			elif app in valid_app[7]:
+				vcal = await bot.vca.create_link(vcid, 'sketch-heads')
+			elif app in valid_app[8]:
+				vcal = await bot.vca.create_link(vcid, 'spellcast')
+			elif app in valid_app[9]:
+				vcal = await bot.vca.create_link(vcid, 'awkword')
+			elif app in valid_app[10]:
+				vcal = await bot.vca.create_link(vcid, 'checkers')
+			else:
+				vcal = None
+
+			if vcal is not None:
+				await ctx.send(f'Join the Voice Chat Activity: {vcal}\nValid only for 15 minutes.', delete_after=900.0)
+			elif vcal is None:
+				await ctx.send(f'Invalid app code: \'{app}\'')
+		except AttributeError:
+			await ctx.send('Join a VC first!')
+	elif app == 'list':
+			embed=discord.Embed(title="Discord Together Applications", description="Available applications for Discord Together")
+			embed.add_field(name="Watch Together", value="[yt, youtube, wt]", inline=False)
+			embed.add_field(name="Poker Night", value="[poker, pn]", inline=False)
+			embed.add_field(name="Chess in the Park", value="[chess]", inline=False)
+			embed.add_field(name="Betrayal.io", value="[betrayal]", inline=False)
+			embed.add_field(name="Fishington.io", value="[fishing]", inline=False)
+			embed.add_field(name="Letter League", value="[letter-league, lt]", inline=False)
+			embed.add_field(name="Word Snack", value="[word-snack, ws]", inline=False)
+			embed.add_field(name="Sketch Heads", value="[sketch-heads, sh]", inline=False)
+			embed.add_field(name="SpellCast", value="[spellcast, sc]", inline=False)
+			embed.add_field(name="Awkword", value="[awkword]", inline=False)
+			embed.add_field(name="Checkers in the Park", value="[checkers]", inline=False)
+			await ctx.send(embed=embed, reference=ctx.message, mention_author=True)
+
 @bot.command( name='roll', description="Roll a dice." )
 async def roll_cmd(ctx, dice_notation:str):
 	dice = dice_notation.lower()
@@ -287,7 +342,7 @@ async def roll_cmd(ctx, dice_notation:str):
 ## SLASH COMMANDS ##
 ##
 
-@slash.slash(name="test")
+'''@slash.slash(name="test")
 async def test(ctx: SlashContext):
 	embed = discord.Embed(title="Embed test", description=":p", colour=discord.Colour(0xd6b4d8))
 	await ctx.send(content="test", embeds=[embed])
@@ -306,6 +361,10 @@ async def context_test(ctx: MenuContext):
 	print( ctx.data )
 	await ctx.send("check console", hidden=True)
 
+@slash.slash(name="vca")
+async def slash_vca(ctx: SlashContext, app='list'):
+	await vca(ctx, app)
+	await ctx.send('vca test')'''
 ##
 ## ERROR HANDLER(S) ##
 ##
@@ -341,4 +400,10 @@ if 'weather' in sys.modules:
 	sched_weather.start()
 if 'keep_alive' in sys.modules:
 	keep_alive()
-bot.run(os.getenv( 'TOKEN' ))
+
+loop = asyncio.get_event_loop()
+bot_loop = loop.create_task(bot.start(os.getenv('TOKEN'), bot=True))
+loops = asyncio.gather(bot_loop, loop=loop)
+loop.run_until_complete(loops)
+
+#bot.run(os.getenv( 'TOKEN' ))
