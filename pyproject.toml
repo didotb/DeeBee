@@ -22,4 +22,5 @@ pytz = "^2021.1"
 virustotal3 = "^1.0.8"
 vt-py = "^0.7.2"
 wget = "^3.2"
+py-cord = "^1.7.3"
 [tool.poetry.dev-dependencies]
