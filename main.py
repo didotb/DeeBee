@@ -1,4 +1,4 @@
-import discord, os, asyncio, pytz, datetime, random, sys, re, traceback
+import discord, os, asyncio, pytz, datetime, random, sys, re
 from collections import deque
 from discord.ext import commands, tasks
 from discord_together import DiscordTogether, errors as dte
