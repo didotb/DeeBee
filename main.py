@@ -1,7 +1,7 @@
-import discord, os, asyncio, pytz, datetime, random, sys, re
+import discord, os, asyncio, pytz, datetime, random, sys, re, traceback
 from collections import deque
 from discord.ext import commands, tasks
-from discord_together import DiscordTogether
+from discord_together import DiscordTogether, errors as dte
 
 try:
 	import weather
@@ -270,45 +270,47 @@ async def send_weather(ctx):
 async def bitch_react(ctx):
 	await ctx.send(content=await bot_startled(str(ctx.author.id)), reference=ctx.message, mention_author=False)
 
-@bot.command( name='vca', aliases=['act', 'dt'], description='Start Discord Together / Voice Chat Activities' )
-async def vca(ctx, app='list'):
-	if app != 'list':
+@bot.command( name='vca', description='Start Discord Together / Voice Chat Activities' )
+async def vca(ctx, app_name=None):
+	if (app_name != 'list') and (app_name is not None):
 		try:
 			vcid = ctx.author.voice.channel.id
 			valid_app = [['youtube', 'yt', 'wt'], ['poker', 'pn'], 'chess', 'betrayal', 'fishing', ['letter-league', 'lt'], ['word-snack', 'ws'], ['sketch-heads', 'sh'], ['spellcast', 'sc'], 'awkword', 'checkers']
 
-			if app in valid_app[0]:
-				vcal = await bot.vca.create_link(vcid, 'youtube')
-			elif app in valid_app[1]:
-				vcal = await bot.vca.create_link(vcid, 'poker')
-			elif app in valid_app[2]:
-				vcal = await bot.vca.create_link(vcid, 'chess')
-			elif app in valid_app[3]:
-				vcal = await bot.vca.create_link(vcid, 'betrayal')
-			elif app in valid_app[4]:
-				vcal = await bot.vca.create_link(vcid, 'fishing')
-			elif app in valid_app[5]:
-				vcal = await bot.vca.create_link(vcid, 'letter-league')
-			elif app in valid_app[6]:
-				vcal = await bot.vca.create_link(vcid, 'word-snack')
-			elif app in valid_app[7]:
-				vcal = await bot.vca.create_link(vcid, 'sketch-heads')
-			elif app in valid_app[8]:
-				vcal = await bot.vca.create_link(vcid, 'spellcast')
-			elif app in valid_app[9]:
-				vcal = await bot.vca.create_link(vcid, 'awkword')
-			elif app in valid_app[10]:
-				vcal = await bot.vca.create_link(vcid, 'checkers')
+			if app_name in valid_app[0]:
+				vcal = await bot.vca.create_link(vcid, 'youtube', max_age=300)
+			elif app_name in valid_app[1]:
+				vcal = await bot.vca.create_link(vcid, 'poker', max_age=300)
+			elif app_name in valid_app[2]:
+				vcal = await bot.vca.create_link(vcid, 'chess', max_age=300)
+			elif app_name in valid_app[3]:
+				vcal = await bot.vca.create_link(vcid, 'betrayal', max_age=300)
+			elif app_name in valid_app[4]:
+				vcal = await bot.vca.create_link(vcid, 'fishing', max_age=300)
+			elif app_name in valid_app[5]:
+				vcal = await bot.vca.create_link(vcid, 'letter-league', max_age=300)
+			elif app_name in valid_app[6]:
+				vcal = await bot.vca.create_link(vcid, 'word-snack', max_age=300)
+			elif app_name in valid_app[7]:
+				vcal = await bot.vca.create_link(vcid, 'sketch-heads', max_age=300)
+			elif app_name in valid_app[8]:
+				vcal = await bot.vca.create_link(vcid, 'spellcast', max_age=300)
+			elif app_name in valid_app[9]:
+				vcal = await bot.vca.create_link(vcid, 'awkword', max_age=300)
+			elif app_name in valid_app[10]:
+				vcal = await bot.vca.create_link(vcid, 'checkers', max_age=300)
 			else:
 				vcal = None
 
 			if vcal is not None:
-				await ctx.send(f'Join the Voice Chat Activity: {vcal}\nValid only for 15 minutes.', delete_after=900.0)
+				await ctx.send(f'Join the Voice Chat Activity: {vcal}\nValid only for 5 minutes.', delete_after=300.0)
 			elif vcal is None:
-				await ctx.send(f'Invalid app code: \'{app}\'')
+				await ctx.send(f'Invalid app code: `{app_name}`')
 		except AttributeError:
 			await ctx.send('Join a VC first!')
-	elif app == 'list':
+		except dte.BotMissingPerms:
+			await ctx.send('`I can\'t seem to create an invite link.\nMake sure users are allowed to make an invite link to the VC.\n(Check VC permissions)`')
+	elif (app_name == 'list') or (app_name is None):
 			embed=discord.Embed(title="Discord Together Applications", description="Available applications for Discord Together")
 			embed.add_field(name="Watch Together", value="[yt, youtube, wt]", inline=False)
 			embed.add_field(name="Poker Night", value="[poker, pn]", inline=False)
@@ -321,7 +323,11 @@ async def vca(ctx, app='list'):
 			embed.add_field(name="SpellCast", value="[spellcast, sc]", inline=False)
 			embed.add_field(name="Awkword", value="[awkword]", inline=False)
 			embed.add_field(name="Checkers in the Park", value="[checkers]", inline=False)
+			embed.set_footer(text="Example: `db vca youtube` to start a Watch Together session.")
 			await ctx.send(embed=embed, reference=ctx.message, mention_author=True)
+
+'''@bot.command(name='embed', description="Manually send an embed message.")
+async def manual_embed(ctx)'''
 
 @bot.command( name='roll', description="Roll a dice." )
 async def roll_cmd(ctx, dice_notation:str):
@@ -377,6 +383,8 @@ async def on_command_error(ctx, error):
 		await ctx.send( f"`{error}`", delete_after=5.0, reference=ctx.message, mention_author=False )
 	elif isinstance(error, commands.MissingPermissions):
 		await ctx.send("You do not have permission to use this command.", delete_after=5.0, reference=ctx.message, mention_author=True)
+	elif isinstance(error, commands.BotMissingPermissions):
+		await ctx.send("I can\'t seem to create an invite link :/")
 	elif isinstance(error, bad_cmd):
 		await ctx.send(f"""```md
 Error in command

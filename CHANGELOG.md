@@ -46,9 +46,8 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
 
 # FUTURE PLANS
 ### Currently Doing
-+ ~~Figure out how to make discord file attachment link readable by VirusTotal~~
-+ ~~Get discord file attachment hashes~~
-  + ~~Submit the file hashes to VirusTotal~~
++ Slow transition from Rapptz's `discord.py` to `Pycord`
+#
 ### To Do
 ###### **_Expand items on To Do list. Be more concise._**
 + Change how file input is sent (discord file links don't work -> Need premium)
@@ -60,8 +59,10 @@ A Passive virus scan with the help of VirusTotal API. Alerts the channel if and 
   + add `entire day` capability
     + use https://www.data.jma.go.jp/mscweb/data/himawari/list_r2w.html for image data
 + Integrate word definition lookup
-  + ~~use PyDictionary~~ ~~Research for alternatives~~
   + [spaCy](https://spacy.io/ "spaCy") is an open source natural language processing
++ Figure out how to make discord file attachment link readable by VirusTotal
++ Get discord file attachment hashes
+  + Submit the file hashes to VirusTotal
 
 #
 #
