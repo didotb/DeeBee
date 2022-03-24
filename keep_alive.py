@@ -1,5 +1,5 @@
 #import datetime, pytz
-import random, string, os
+import random, string, os, datetime, pytz
 import hashlib as h
 from flask import Flask, redirect, request#, jsonify
 from flask_simplelogin import SimpleLogin, login_required, is_logged_in
@@ -24,13 +24,11 @@ def check( user ):
 
 @app.route( '/' )
 def home():
-	'''dt = datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '(%b %d, %Y - %X)\n' )
-	ip = 'ip: ' + str( request.remote_addr )
-	browser = 'user-agent: ' + str( request.headers.get( 'User-Agent' ) )
+	dt = datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '(%b %d, %Y - %X)\n' )
 	header = 'full header request: ' + str( request.headers )
 	with open( 'flask.log', 'a' ) as file:
-		file.write( dt + ip + ' ' + browser + '\n' + header )'''
-	return f"<a href='{invite_link}'>Invite DeeBee Bot</a><br><br>Permissions:\n<ul>&bull;&emsp;Administrator (Optional)</ul><ul>&bull;&emsp;Slash Commands</ul>"
+		file.write( f'{dt}{header}' )
+	return f"<a href='{invite_link}'>Invite DeeBee Bot</a><br><br>Permissions:\n<ul>&bull;&emsp;Administrator (Optional)</ul><ul>&bull;&emsp;Slash Commands</ul><ul>&bull;&emsp;Start Activities</ul><ul>&bull;&emsp;Create Invite link (for Discord Together)</ul>"
 
 @app.route( '/hook/' )
 def hook_redirect():

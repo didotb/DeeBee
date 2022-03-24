@@ -1,6 +1,7 @@
 import discord, os, asyncio, pytz, datetime, random, sys, re
 from collections import deque
 from discord.ext import commands, tasks
+from discord.commands import Option
 from discord_together import DiscordTogether, errors as dte
 
 try:
@@ -46,9 +47,9 @@ def emote(animated, emojiName):
 def roll(start:int, kind:str=None, stop:int=None):
 	out:int = 0
 	if start <= 0 or stop <= 0:
-		return 'Cannot roll ' +start+ ' amount of dice with '+stop+' amount of sides.'
+		return f'Cannot roll {start} amount of dice with {stop} amount of sides.'
 	if kind is None:
-		return f'Invalid input: missing argument \'kind\''
+		return 'Invalid input: missing argument \'kind\''
 	elif kind == 'd':
 		if start <= 9999:
 			for i in range(1,start+1):
@@ -68,8 +69,8 @@ async def bot_startled(author:str):
 		await debug(msg='author id: ' + author)
 		return 'Command broke, check debug channel, and console.'
 
-async def debug( msg:str = None, pre_msg:int = None, cid:int = int( os.environ[ 'discord-channel_debug' ] ) ):
-	if pre_msg is not None:
+async def debug( cmsg:str = None, pmsg:int = None, cid:int = int( os.environ[ 'discord-channel_debug' ] ) ):
+	if pmsg is not None:
 		switcher = {
 			0:"InfNo:0: Process ended",
 			1:"InfNo:1: Process started",
@@ -77,9 +78,9 @@ async def debug( msg:str = None, pre_msg:int = None, cid:int = int( os.environ[ 
 			3:"InfNo:3: Weather loop started",
 			4:"InfNo:4: Weather animation sent"
 		}
-		message = switcher.get( pre_msg, "Warning: Error getting pre-determined message" )
-	elif msg is not None:
-		message = "Custom: " + msg
+		message = switcher.get( pmsg, "Warning: Error getting pre-determined message" )
+	elif cmsg is not None:
+		message = "Custom: " + cmsg
 	else:
 		message = "Warning: Generic debug message"
 
@@ -132,10 +133,10 @@ async def on_ready():
 	print(f'logged in as {bot.user}')
 
 	name = "\'db help\'"
-	act = discord.ActivityType.listening
+	act = discord.ActivityType.streaming
 
 	activity = discord.Activity( name=name, details='Testing', type=act )
-	await bot.change_presence( activity=activity, status=discord.Status.online, afk=False )
+	await bot.change_presence(activity=activity, status=discord.Status.streaming)
 
 	bot.vca = await DiscordTogether(os.getenv( 'TOKEN' ))
 
@@ -342,35 +343,42 @@ async def roll_cmd(ctx, dice_notation:str):
 			raise commands.BadArgument("Bad argument: Invalid input.\nUse simple dice notation. Algebraic expressions not yet supported.")
 	if divd[1] not in dicelist:
 		raise commands.BadArgument(f"BadArgument: Invalid dice type.\n\'{divd[1]}\' is not a valid type of dice.")
-	await ctx.send(content=roll(divd[0],divd[1],divd[2]), reference=ctx.message, mention_author=False)
+	await ctx.respond(content=roll(divd[0],divd[1],divd[2]), reference=ctx.message, mention_author=False)
 
 ##
 ## SLASH COMMANDS ##
 ##
 
-'''@slash.slash(name="test")
-async def test(ctx: SlashContext):
+@bot.slash_command(name="test")
+async def test(ctx):
 	embed = discord.Embed(title="Embed test", description=":p", colour=discord.Colour(0xd6b4d8))
-	await ctx.send(content="test", embeds=[embed])
+	await ctx.respond(content="test", embeds=[embed], hidden=True)
 
-@slash.context_menu(name="apps test", target=3)
-async def ctx_menu_test(ctx: SlashContext):
+'''@slash.context_menu(name="apps test", target=3)
+async def ctx_menu_test(ctx):
 	embed = discord.Embed(title="Apps test", description="yep, another test, but this time from Apps menu :p BTW, there's a \"hidden\" command ;)", colour=discord.Colour(0xd6b4d8))
-	await ctx.send(content="yes, this is a test.. again", embeds=[embed])
+	await ctx.send(content="yes, this is a test.. again", embeds=[embed])'''
 
-@slash.slash(name="hidden")
-async def hidden_test(ctx: SlashContext):
-	await ctx.send(content="d: sapnu puas", hidden=True)
+@bot.slash_command(name="hidden")
+async def hidden_test(ctx):
+	await ctx.respond(content="d: sapnu puas")
 
-@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_db-server'])])
-async def context_test(ctx: MenuContext):
+'''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_db-server'])])
+async def context_test(ctx):
 	print( ctx.data )
-	await ctx.send("check console", hidden=True)
+	await ctx.send("check console", hidden=True)'''
 
-@slash.slash(name="vca")
-async def slash_vca(ctx: SlashContext, app='list'):
-	await vca(ctx, app)
-	await ctx.send('vca test')'''
+@bot.slash_command(name="vca")
+async def slash_vca(
+	ctx,
+	app_name: Option(str, "Enter the app name", choices=[
+		'youtube', 'poker', 'chess',
+		'betrayal', 'fishing', 'letter-league',
+		'word-snack', 'sketch-heads', 'spellcast',
+		'awkword', 'checkers'], default=None)
+):
+	await vca(ctx, app_name)
+
 ##
 ## ERROR HANDLER(S) ##
 ##
@@ -410,7 +418,7 @@ if 'keep_alive' in sys.modules:
 	keep_alive()
 
 loop = asyncio.get_event_loop()
-bot_loop = loop.create_task(bot.start(os.getenv('TOKEN'), bot=True))
+bot_loop = loop.create_task(bot.start(os.getenv('TOKEN')))
 loops = asyncio.gather(bot_loop, loop=loop)
 loop.run_until_complete(loops)
 
