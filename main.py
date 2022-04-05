@@ -371,7 +371,7 @@ async def hidden_test(ctx):
 '''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_debug-server'])])
 async def context_test(ctx):
 	print( ctx.data )
-	await ctx.send("check console", hidden=True)'''
+	await ctx.send("check console", ephemeral=True)'''
 
 @bot.slash_command(name="vca")
 async def slash_vca(
