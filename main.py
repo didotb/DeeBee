@@ -43,6 +43,47 @@ def emote(animated, emojiName):
 	elif animated == True:
 		return "`Error retriving animated emote. Check name or spelling.`"
 
+# main vca function
+async def act_app(vcid, app_name=None):
+	try:
+		valid_app = [['youtube', 'yt', 'wt'], ['poker', 'pn'], 'chess', 'betrayal', 'fishing', ['letter-league', 'lt'], ['word-snack', 'ws'], ['sketch-heads', 'sh'], ['spellcast', 'sc'], 'awkword', 'checkers']
+
+		if app_name in valid_app[0]:
+			vcal = await bot.vca.create_link(vcid, 'youtube', max_age=300)
+		elif app_name in valid_app[1]:
+			vcal = await bot.vca.create_link(vcid, 'poker', max_age=300)
+		elif app_name in valid_app[2]:
+			vcal = await bot.vca.create_link(vcid, 'chess', max_age=300)
+		elif app_name in valid_app[3]:
+			vcal = await bot.vca.create_link(vcid, 'betrayal', max_age=300)
+		elif app_name in valid_app[4]:
+			vcal = await bot.vca.create_link(vcid, 'fishing', max_age=300)
+		elif app_name in valid_app[5]:
+			vcal = await bot.vca.create_link(vcid, 'letter-league', max_age=300)
+		elif app_name in valid_app[6]:
+			vcal = await bot.vca.create_link(vcid, 'word-snack', max_age=300)
+		elif app_name in valid_app[7]:
+			vcal = await bot.vca.create_link(vcid, 'sketch-heads', max_age=300)
+		elif app_name in valid_app[8]:
+			vcal = await bot.vca.create_link(vcid, 'spellcast', max_age=300)
+		elif app_name in valid_app[9]:
+			vcal = await bot.vca.create_link(vcid, 'awkword', max_age=300)
+		elif app_name in valid_app[10]:
+			vcal = await bot.vca.create_link(vcid, 'checkers', max_age=300)
+		else:
+			vcal = None
+
+		if vcal is not None:
+			return f'Join the Voice Chat Activity: {vcal}\nValid only for 5 minutes.'
+		elif vcal is None:
+			return f'Invalid app code: `{app_name}`'
+		else:
+			raise dte.BotMissingPerms
+	except AttributeError:
+		return 'Join a VC first!'
+	except dte.BotMissingPerms:
+		return '`I can\'t seem to create an invite link.\nMake sure users are allowed to make an invite link to the VC.\n(Check VC permissions)`'
+
 # actually fixed this using RegEx
 def roll(start:int, kind:str=None, stop:int=None):
 	out:int = 0
@@ -101,23 +142,23 @@ if 'weather' in sys.modules:
 		channel = bot.get_channel( int( os.environ[ 'discord-channel_vii-weather' ] ) )
 
 		if hours == 9 or hours == 13:
-			await debug(pre_msg=1)
+			await debug(pmsg=1)
 			weather.weather('latest')
 			async with channel.typing():
 				await asyncio.sleep(30)
 			await channel.send("__2 hour interval__ mid-day daily weather images", file = discord.File('out.mp4'))
 
 		if hours % 4 == 3:
-			await debug( pre_msg = 1 )
+			await debug( pmsg = 1 )
 			weather.weather( 'latest' )
 			async with channel.typing():
 				await asyncio.sleep( 30 )
 			await channel.send(  "__4 hour interval__ daily weather images", file = discord.File( 'out.mp4' ) )
 
 		if os.path.exists(weather.target):
-			await debug( pre_msg = 4 )
+			await debug( pmsg = 4 )
 			weather.clean()
-			await debug( pre_msg = 0 )
+			await debug( pmsg = 0 )
 
 	@sched_weather.before_loop
 	async def before():
@@ -187,7 +228,7 @@ async def on_message(msg):
 		await msg.add_reaction(emoji=emote(False, "mmmseks"))
 
 	details = f"```{str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ))}\n# Author: {msg.author.name}\n# Server Name: {msg.guild.name}\n# Channel Name: {msg.channel.name}\n\n{msg.content}```"
-	if msg.guild.id != int(os.environ['discord-guild_migs-server']) and msg.guild.id != int(os.environ['discord-guild_beaneyboo-server']) and msg.guild.id != int(os.environ['discord-guild_db-server']):
+	if msg.guild.id != int(os.environ['discord-guild_REDACTED-1-server']) and msg.guild.id != int(os.environ['discord-guild_beaneyboo-server']) and msg.guild.id != int(os.environ['discord-guild_debug-server']):
 		if msg.attachments:
 			channel = bot.get_channel(int(os.environ['discord-channel_images-archive']))
 			for i in msg.attachments:
@@ -257,60 +298,24 @@ async def send_weather(ctx):
 	if 'weather' not in sys.modules:
 		await ctx.send(content="Weather module was not imported. Please check console for problems.")
 		return None
-	await debug( msg="Requested weather command" )
-	await ctx.send( content="Please wait 1 minute. Generating __requested__ images.", delete_after=33.0, reference=ctx.message, mention_author=False )
+	await debug( cmsg="Requested weather command" )
+	await ctx.send( content="Please wait 1 minute. Generating __requested__ images.", reference=ctx.message, mention_author=True )
 	weather.weather( 'latest' )
 	async with ctx.typing():
 		await asyncio.sleep(30)
-	await ctx.send(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'), reference=ctx.message, mention_author=True)
-	await debug( pre_msg=4 )
+	await ctx.edit(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'))
+	await debug( pmsg=4 )
 	weather.clean()
-	await debug( pre_msg=0 )
+	await debug( pmsg=0 )
 
 @bot.command( name='bitch', aliases=['bij'], hidden=True )
 async def bitch_react(ctx):
-	await ctx.send(content=await bot_startled(str(ctx.author.id)), reference=ctx.message, mention_author=False)
+	await ctx.reply(content=await bot_startled(str(ctx.author.id)), mention_author=False)
 
 @bot.command( name='vca', description='Start Discord Together / Voice Chat Activities' )
 async def vca(ctx, app_name=None):
 	if (app_name != 'list') and (app_name is not None):
-		try:
-			vcid = ctx.author.voice.channel.id
-			valid_app = [['youtube', 'yt', 'wt'], ['poker', 'pn'], 'chess', 'betrayal', 'fishing', ['letter-league', 'lt'], ['word-snack', 'ws'], ['sketch-heads', 'sh'], ['spellcast', 'sc'], 'awkword', 'checkers']
-
-			if app_name in valid_app[0]:
-				vcal = await bot.vca.create_link(vcid, 'youtube', max_age=300)
-			elif app_name in valid_app[1]:
-				vcal = await bot.vca.create_link(vcid, 'poker', max_age=300)
-			elif app_name in valid_app[2]:
-				vcal = await bot.vca.create_link(vcid, 'chess', max_age=300)
-			elif app_name in valid_app[3]:
-				vcal = await bot.vca.create_link(vcid, 'betrayal', max_age=300)
-			elif app_name in valid_app[4]:
-				vcal = await bot.vca.create_link(vcid, 'fishing', max_age=300)
-			elif app_name in valid_app[5]:
-				vcal = await bot.vca.create_link(vcid, 'letter-league', max_age=300)
-			elif app_name in valid_app[6]:
-				vcal = await bot.vca.create_link(vcid, 'word-snack', max_age=300)
-			elif app_name in valid_app[7]:
-				vcal = await bot.vca.create_link(vcid, 'sketch-heads', max_age=300)
-			elif app_name in valid_app[8]:
-				vcal = await bot.vca.create_link(vcid, 'spellcast', max_age=300)
-			elif app_name in valid_app[9]:
-				vcal = await bot.vca.create_link(vcid, 'awkword', max_age=300)
-			elif app_name in valid_app[10]:
-				vcal = await bot.vca.create_link(vcid, 'checkers', max_age=300)
-			else:
-				vcal = None
-
-			if vcal is not None:
-				await ctx.send(f'Join the Voice Chat Activity: {vcal}\nValid only for 5 minutes.', delete_after=300.0)
-			elif vcal is None:
-				await ctx.send(f'Invalid app code: `{app_name}`')
-		except AttributeError:
-			await ctx.send('Join a VC first!')
-		except dte.BotMissingPerms:
-			await ctx.send('`I can\'t seem to create an invite link.\nMake sure users are allowed to make an invite link to the VC.\n(Check VC permissions)`')
+		await ctx.reply(await act_app(ctx.author.voice.channel.id, app_name), delete_after=300.0)
 	elif (app_name == 'list') or (app_name is None):
 			embed=discord.Embed(title="Discord Together Applications", description="Available applications for Discord Together")
 			embed.add_field(name="Watch Together", value="[yt, youtube, wt]", inline=False)
@@ -325,7 +330,7 @@ async def vca(ctx, app_name=None):
 			embed.add_field(name="Awkword", value="[awkword]", inline=False)
 			embed.add_field(name="Checkers in the Park", value="[checkers]", inline=False)
 			embed.set_footer(text="Example: `db vca youtube` to start a Watch Together session.")
-			await ctx.send(embed=embed, reference=ctx.message, mention_author=True)
+			await ctx.reply(embed=embed, mention_author=True)
 
 '''@bot.command(name='embed', description="Manually send an embed message.")
 async def manual_embed(ctx)'''
@@ -343,7 +348,7 @@ async def roll_cmd(ctx, dice_notation:str):
 			raise commands.BadArgument("Bad argument: Invalid input.\nUse simple dice notation. Algebraic expressions not yet supported.")
 	if divd[1] not in dicelist:
 		raise commands.BadArgument(f"BadArgument: Invalid dice type.\n\'{divd[1]}\' is not a valid type of dice.")
-	await ctx.respond(content=roll(divd[0],divd[1],divd[2]), reference=ctx.message, mention_author=False)
+	await ctx.reply(content=roll(divd[0],divd[1],divd[2]), mention_author=False)
 
 ##
 ## SLASH COMMANDS ##
@@ -363,7 +368,7 @@ async def ctx_menu_test(ctx):
 async def hidden_test(ctx):
 	await ctx.respond(content="d: sapnu puas")
 
-'''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_db-server'])])
+'''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_debug-server'])])
 async def context_test(ctx):
 	print( ctx.data )
 	await ctx.send("check console", hidden=True)'''
@@ -377,7 +382,22 @@ async def slash_vca(
 		'word-snack', 'sketch-heads', 'spellcast',
 		'awkword', 'checkers'], default=None)
 ):
-	await vca(ctx, app_name)
+	await ctx.respond(await act_app(ctx.author.voice.channel.id, app_name), delete_after=300.0)
+
+@bot.slash_command(name="weather")
+async def slash_weather(ctx):
+	if 'weather' not in sys.modules:
+		await ctx.respond(content="Weather module was not imported. Please check console for problems.")
+		return None
+	await debug( cmsg="Requested weather command" )
+	await ctx.respond( content="Please wait 1 minute. Generating __requested__ images." )
+	weather.weather( 'latest' )
+	async with ctx.typing():
+		await asyncio.sleep(30)
+	await ctx.edit(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'))
+	await debug( pmsg=4 )
+	weather.clean()
+	await debug( pmsg=0 )
 
 ##
 ## ERROR HANDLER(S) ##
