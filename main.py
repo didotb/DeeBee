@@ -357,7 +357,7 @@ async def roll_cmd(ctx, dice_notation:str):
 @bot.slash_command(name="test")
 async def test(ctx):
 	embed = discord.Embed(title="Embed test", description=":p", colour=discord.Colour(0xd6b4d8))
-	await ctx.respond(content="test", embeds=[embed], hidden=True)
+	await ctx.respond(content="test", embeds=[embed], ephemeral=True)
 
 '''@slash.context_menu(name="apps test", target=3)
 async def ctx_menu_test(ctx):
@@ -366,7 +366,7 @@ async def ctx_menu_test(ctx):
 
 @bot.slash_command(name="hidden")
 async def hidden_test(ctx):
-	await ctx.respond(content="d: sapnu puas")
+	await ctx.respond(content="d: sapnu puas", ephemeral=True)
 
 '''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_debug-server'])])
 async def context_test(ctx):
