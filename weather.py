@@ -1,5 +1,4 @@
-import wget
-import os
+import wget, os, multiprocessing as mp, time as tm
 from os import path
 
 config = './weather/irgmsw.cfg'
@@ -11,7 +10,6 @@ def weather( time='latest' ):
   if( time == 'latest' ):
     configURL = 'https://www.goes.noaa.gov/sohemi/sohemiloops/irgmsw.cfg'
     baseURL = 'https://www.goes.noaa.gov/sohemi/sohemiloops/'
-    k = 0
 
     if( os.listdir( imageDIR ) != [] ):
       os.system( "rm " + imageDIR + "*" )
@@ -21,16 +19,24 @@ def weather( time='latest' ):
     wget.download( configURL, config )
     os.system( "cat " + config + " | grep 'filenames = ' | sed 's|filenames = ||' > " + filenames )
 
+    p = mp.Pool(mp.cpu_count())
     with open( filenames ) as names:
       for i in names:
         temp = i.strip('\n').split( ', ' )
-        for j in temp:
-          k = k + 1
-          directory = imageDIR + "0" + str( k ) + ".jpg"
-          os.system( "wget -O " + directory + " " + baseURL + j )
+        p.map(dl_start, [[str(baseURL+i)] for i in temp])
       names.close()
+    p.close()
 
+    imageFiles = [os.path.join(imageDIR,files) for files in os.listdir(imageDIR)]
+    c=0
+    for i in imageFiles:
+      os.rename(i,str(os.path.join(imageDIR,"0"+str(c)+".jpg")))
+      c+=1
     os.system( "ffmpeg -i " + imageDIR + "0%d.jpg -c:v libx264 -pix_fmt yuv420p -an -filter_complex '[0]setpts=3*PTS' -preset veryfast -y " + target )
+
+def dl_start(frames):
+  for j in frames:
+    os.system("wget -P "+imageDIR+" "+j)
 
 def clean():
 	if path.exists( target ): os.system( "rm " + target )

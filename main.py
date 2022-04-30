@@ -3,7 +3,7 @@ from collections import deque
 from discord.ext import commands, tasks
 from discord.commands import Option
 from discord_together import DiscordTogether, errors as dte
-
+from simple_rng import roll
 try:
 	import weather
 except:
@@ -24,7 +24,7 @@ msgTrigA = ['wiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
 dicelist = {'d','r'}
-bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord-user_d.b']), strip_after_prefix=True )
+bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord_user_db']), strip_after_prefix=True )
 
 def emote(animated, emojiName):
 	eName = emojiName.lower()
@@ -84,33 +84,16 @@ async def act_app(vcid, app_name=None):
 	except dte.BotMissingPerms:
 		return '`I can\'t seem to create an invite link.\nMake sure users are allowed to make an invite link to the VC.\n(Check VC permissions)`'
 
-# actually fixed this using RegEx
-def roll(start:int, kind:str=None, stop:int=None):
-	out:int = 0
-	if start <= 0 or stop <= 0:
-		return f'Cannot roll {start} amount of dice with {stop} amount of sides.'
-	if kind is None:
-		return 'Invalid input: missing argument \'kind\''
-	elif kind == 'd':
-		if start <= 9999:
-			for i in range(1,start+1):
-				out:int = out + random.randint(1,stop)
-			return out
-		else:
-			return f'Not enough memory to calculate {str(start)} amount of dice.'
-	#elif kind == 'r':
-		# insert stuff later
-
 async def bot_startled(author:str):
-	if author != os.environ['discord-user_d.b']:
+	if author != os.environ['discord_user_db']:
 		return emote(False, "bij") + ' what? <@' + author + '>'
-	elif author == os.environ['discord-user_d.b']:
+	elif author == os.environ['discord_user_db']:
 		return 'eyy <@' + author + '>! what\'s up'
 	else:
 		await debug(msg='author id: ' + author)
 		return 'Command broke, check debug channel, and console.'
 
-async def debug( cmsg:str = None, pmsg:int = None, cid:int = int( os.environ[ 'discord-channel_debug' ] ) ):
+async def debug( cmsg:str = None, pmsg:int = None, cid:int = int( os.environ[ 'discord_channel_debug' ] ) ):
 	if pmsg is not None:
 		switcher = {
 			0:"InfNo:0: Process ended",
@@ -139,20 +122,20 @@ if 'weather' in sys.modules:
 	async def sched_weather():
 		hours = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%H' ) )
 		print( "Another hour has passed: " + str( hours + 1 ) )
-		channel = bot.get_channel( int( os.environ[ 'discord-channel_vii-weather' ] ) )
+		channel = bot.get_channel( int( os.environ[ 'discord_channel_vii_weather' ] ) )
 
 		if hours == 9 or hours == 13:
 			await debug(pmsg=1)
 			weather.weather('latest')
 			async with channel.typing():
-				await asyncio.sleep(30)
+				await asyncio.sleep(11)
 			await channel.send("__2 hour interval__ mid-day daily weather images", file = discord.File('out.mp4'))
 
 		if hours % 4 == 3:
 			await debug( pmsg = 1 )
 			weather.weather( 'latest' )
 			async with channel.typing():
-				await asyncio.sleep( 30 )
+				await asyncio.sleep(11)
 			await channel.send(  "__4 hour interval__ daily weather images", file = discord.File( 'out.mp4' ) )
 
 		if os.path.exists(weather.target):
@@ -161,10 +144,10 @@ if 'weather' in sys.modules:
 			await debug( pmsg = 0 )
 
 	@sched_weather.before_loop
-	async def before():
+	async def sched_weather_before():
 		minutes = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%M' ) )
 		seconds = int( datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ).strftime( '%S' ) )
-		wait = 3600 - ( ( ( minutes + 1 ) * 60 ) + ( seconds - 30 ) )
+		wait = 3600 - ( ( ( minutes + 1 ) * 60 ) + ( seconds - 30 ) ) # wait for 30 secs early before an absolute hour
 		print("weather waiting")
 		await asyncio.sleep( wait )
 		await bot.wait_until_ready()
@@ -190,7 +173,7 @@ async def on_message(msg):
 	mTrig = (cont for cont in msgCont if cont in msgTrig)
 	mYep = (cont for cont in msgCont if cont in msgYEP)
 
-	if (msg.author == bot.user) and ((msg.channel.id == int(os.environ['discord-channel_vii-weather']) and msg.attachments)) or (msg.channel.id == int(os.environ['discord-channel_vii_days-before-xmas'])):
+	if (msg.author == bot.user) and ((msg.channel.id == int(os.environ['discord_channel_vii_weather']) and msg.attachments)) or (msg.channel.id == int(os.environ['discord_channel_vii_days_before_xmas'])):
 		await asyncio.sleep(3)
 		await msg.publish()
 
@@ -220,7 +203,7 @@ async def on_message(msg):
 		await msg.channel.send(content=await bot_startled(str(msg.author.id)), reference=msg, mention_author=True)
 
 	for cont in mf:
-		if ( cont in msg.content.lower() ) and str( msg.author.id ) != os.environ[ 'discord-user_d.b' ]:
+		if ( cont in msg.content.lower() ) and str( msg.author.id ) != os.environ[ 'discord_user_db' ]:
 			await msg.channel.send(content="no u.", reference=msg, mention_author=True)
 
 	if 'new pc' in msg.content.lower():
@@ -228,17 +211,17 @@ async def on_message(msg):
 		await msg.add_reaction(emoji=emote(False, "mmmseks"))
 
 	details = f"```{str(datetime.datetime.now( datetime.timezone.utc ).astimezone( pytz.timezone( 'Asia/Manila' ) ))}\n# Author: {msg.author.name}\n# Server Name: {msg.guild.name}\n# Channel Name: {msg.channel.name}\n\n{msg.content}```"
-	if msg.guild.id != int(os.environ['discord-guild_REDACTED-1-server']) and msg.guild.id != int(os.environ['discord-guild_beaneyboo-server']) and msg.guild.id != int(os.environ['discord-guild_debug-server']):
+	if msg.guild.id != int(os.environ['discord_guild_REDACTED_1_server']) and msg.guild.id != int(os.environ['discord_guild_beaneyboo_server']) and msg.guild.id != int(os.environ['discord_guild_debug_server']):
 		if msg.attachments:
-			channel = bot.get_channel(int(os.environ['discord-channel_images-archive']))
+			channel = bot.get_channel(int(os.environ['discord_channel_images_archive']))
 			for i in msg.attachments:
 				await channel.send(details, file=await i.to_file())
 		if not msg.attachments:
-			channel = bot.get_channel(int(os.environ['discord-channel_text-archive']))
+			channel = bot.get_channel(int(os.environ['discord_channel_text_archive']))
 			await channel.send(details)
 
-	if msg.guild.id == int(os.environ['discord-guild_foxy-server']):
-		channel = bot.get_channel(int(os.environ['discord-channel_foxy-archive']))
+	if msg.guild.id == int(os.environ['discord_guild_foxy_server']):
+		channel = bot.get_channel(int(os.environ['discord_channel_foxy_archive']))
 		if msg.attachments:
 			for i in msg.attachments:
 				att = await i.to_file()
@@ -246,8 +229,8 @@ async def on_message(msg):
 		if not msg.attachments:
 			await channel.send(details)
 
-	if msg.guild.id == int(os.environ['discord-guild_beaneyboo-server']) and (msg.channel.id != int(os.environ['discord-channel_beaneyboo-mods-priv']) and msg.channel.id != int(os.environ['discord-channel_beaneyboo-moderator-only']) and msg.channel.id != int(os.environ['discord-channel_beaneyboo-msg-archiving'])):
-		channel = bot.get_channel(int(os.environ['discord-channel_beaneyboo-msg-archiving']))
+	if msg.guild.id == int(os.environ['discord_guild_beaneyboo_server']) and (msg.channel.id != int(os.environ['discord_channel_beaneyboo_mods_priv']) and msg.channel.id != int(os.environ['discord_channel_beaneyboo_moderator_only']) and msg.channel.id != int(os.environ['discord_channel_beaneyboo_msg_archiving'])):
+		channel = bot.get_channel(int(os.environ['discord_channel_beaneyboo_msg_archiving']))
 		if msg.attachments:
 			for i in msg.attachments:
 				att = await i.to_file()
@@ -255,7 +238,7 @@ async def on_message(msg):
 		if not msg.attachments:
 			await channel.send(details)
 
-	if msg.channel.id in [int(os.environ['discord-channel_beaneyboo-announcement'])]:
+	if msg.channel.id in [int(os.environ['discord_channel_beaneyboo_announcement'])]:
 		await asyncio.sleep(3)
 		await msg.publish()
 
@@ -268,8 +251,8 @@ async def on_message(msg):
 
 @bot.command( name='troll', hidden=True )
 async def troll(ctx):
-	#cnl = bot.get_channel( int( os.environ['discord-channel_vii_days-before-xmas'] ) )
-	msg = f"<@{os.environ['discord-user_d.b']}> gae."
+	#cnl = bot.get_channel( int( os.environ['discord_channel_vii_days_before_xmas'] ) )
+	msg = f"<@{os.environ['discord_user_db']}> gae."
 	await ctx.send(content=msg)
 
 @bot.command( name='hello', aliases=['hi'], description="Greet user with Hello!" )
@@ -299,7 +282,7 @@ async def send_weather(ctx):
 		await ctx.send(content="Weather module was not imported. Please check console for problems.")
 		return None
 	await debug( cmsg="Requested weather command" )
-	await ctx.send( content="Please wait 1 minute. Generating __requested__ images.", reference=ctx.message, mention_author=True )
+	await ctx.send( content="Please wait 15 seconds. Generating __requested__ images.", reference=ctx.message, mention_author=True )
 	weather.weather( 'latest' )
 	async with ctx.typing():
 		await asyncio.sleep(30)
@@ -332,9 +315,6 @@ async def vca(ctx, app_name=None):
 			embed.set_footer(text="Example: `db vca youtube` to start a Watch Together session.")
 			await ctx.reply(embed=embed, mention_author=True)
 
-'''@bot.command(name='embed', description="Manually send an embed message.")
-async def manual_embed(ctx)'''
-
 @bot.command( name='roll', description="Roll a dice." )
 async def roll_cmd(ctx, dice_notation:str):
 	dice = dice_notation.lower()
@@ -350,6 +330,11 @@ async def roll_cmd(ctx, dice_notation:str):
 		raise commands.BadArgument(f"BadArgument: Invalid dice type.\n\'{divd[1]}\' is not a valid type of dice.")
 	await ctx.reply(content=roll(divd[0],divd[1],divd[2]), mention_author=False)
 
+@bot.command(name="debug", description="Send a test debug message")
+async def command_debug(ctx, *, message:str=None):
+	await ctx.reply(content="Check debug channel.", mention_author=False)
+	await on_command_error(ctx, error=message if message is not None else "Test error")
+
 ##
 ## SLASH COMMANDS ##
 ##
@@ -359,16 +344,11 @@ async def test(ctx):
 	embed = discord.Embed(title="Embed test", description=":p", colour=discord.Colour(0xd6b4d8))
 	await ctx.respond(content="test", embeds=[embed], ephemeral=True)
 
-'''@slash.context_menu(name="apps test", target=3)
-async def ctx_menu_test(ctx):
-	embed = discord.Embed(title="Apps test", description="yep, another test, but this time from Apps menu :p BTW, there's a \"hidden\" command ;)", colour=discord.Colour(0xd6b4d8))
-	await ctx.send(content="yes, this is a test.. again", embeds=[embed])'''
-
 @bot.slash_command(name="hidden")
 async def hidden_test(ctx):
 	await ctx.respond(content="d: sapnu puas", ephemeral=True)
 
-'''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord-guild_debug-server'])])
+'''@slash.context_menu(name="context", target=3, guild_ids=[int(os.environ['discord_guild_debug_server'])])
 async def context_test(ctx):
 	print( ctx.data )
 	await ctx.send("check console", ephemeral=True)'''
@@ -384,20 +364,64 @@ async def slash_vca(
 ):
 	await ctx.respond(await act_app(ctx.author.voice.channel.id, app_name), delete_after=300.0)
 
-@bot.slash_command(name="weather")
-async def slash_weather(ctx):
+@bot.slash_command(name="weather", description="Generate weather images.")
+async def slash_weather(ctx, action='latest'):
 	if 'weather' not in sys.modules:
 		await ctx.respond(content="Weather module was not imported. Please check console for problems.")
 		return None
-	await debug( cmsg="Requested weather command" )
-	await ctx.respond( content="Please wait 1 minute. Generating __requested__ images." )
-	weather.weather( 'latest' )
-	async with ctx.typing():
-		await asyncio.sleep(30)
-	await ctx.edit(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'))
-	await debug( pmsg=4 )
-	weather.clean()
-	await debug( pmsg=0 )
+	else:
+		if action == 'clean':
+			weather.clean()
+			await ctx.respond(content="Cache of weather images has been cleared.", ephemeral=True)
+		elif action == 'latest':
+			await debug( cmsg="Requested weather command" )
+			await ctx.respond( content="Please wait 15 seconds. Generating __requested__ images." )
+			weather.weather(action)
+			async with ctx.typing():
+				await asyncio.sleep(10)
+			await ctx.edit(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'))
+			await debug( pmsg=4 )
+			weather.clean()
+			await debug( pmsg=0 )
+
+@bot.slash_command(name="announcement", description="Send an announcement to a channel.")
+async def slash_announcement(ctx, content:str, test:bool, colour:int=0xffb9d2, channel:str=None):
+	embed = discord.Embed(title="Announcement", description=f"Author: {ctx.author}", colour=int(colour))
+	#embed.set_thumbnail(url=ctx.author.display_avatar)
+	embed.add_field(name="Content:", value=content)
+	embed.set_footer(text=f"Published: {datetime.datetime.now(datetime.timezone.utc).astimezone(pytz.timezone('Asia/Manila')).strftime('%b %d, %Y :: %I.%M.%S %p')}")
+	if (channel is not None) and (test is False):
+		cnl = bot.get_channel(int(channel))
+		if(cnl.permissions_for(cnl.guild.get_member(ctx.author.id)).send_messages):
+			await cnl.send(embed=embed)
+			await ctx.respond(content="Message sent")
+		else:
+			raise commands.MissingPermissions()
+	else:
+		await ctx.respond(embed=embed, ephemeral=False if test==False else True)
+
+@bot.slash_command(name="debug", description="Send a test debug message.")
+async def slash_debug(ctx, message:str=None):
+	await ctx.respond(content="Check debug channel.", ephemeral=True)
+	await on_command_error(ctx, error=message if message is not None else "Test error")
+
+@bot.slash_command(name="init")
+async def slash_init(ctx):
+	ctx.respond("Refreshing commands.", ephemeral=True)
+
+@bot.slash_command(name="shutdown", description="Shutdown bot.", hidden=True)
+async def slash_shutdown(ctx, reason=None, schedule=5, silent:bool=None):
+	try:
+		shutdown_sched = int(schedule)
+	except ValueError as e:
+		await ctx.respond(e, ephemeral=True)
+		return None
+	embed = discord.Embed(title=f"Scheduled Shutdown", description=f"Shutdown in {shutdown_sched} seconds.", colour=int(0xffb9d2))
+	embed.add_field(name="Reason:", value=reason if reason is not None else "No reason stated.")
+	embed.set_footer(text=f"Scheduled by: {ctx.author}")
+	await ctx.respond(embed=embed, ephemeral=True if silent==True else False)
+	await asyncio.sleep(shutdown_sched)
+	await bot.close()
 
 ##
 ## ERROR HANDLER(S) ##
@@ -414,19 +438,17 @@ async def on_command_error(ctx, error):
 	elif isinstance(error, commands.BotMissingPermissions):
 		await ctx.send("I can\'t seem to create an invite link :/")
 	elif isinstance(error, bad_cmd):
-		await ctx.send(f"""```md
-Error in command
-{error}
-# Message will delete after 15 seconds.
-
-<Usage: {ctx.command} {ctx.command.signature}>
-```""", delete_after=15.0, reference=ctx.message, mention_author=False)
+		embed = discord.Embed(title="Error in command", description=f"Command: {ctx.command}")
+		embed.add_field(name="Details:", value=f"{error}")
+		embed.set_footer(text=f"Usage: {ctx.command} {ctx.command.signature}")
+		await ctx.send(embed=embed, reference=ctx.message, mention_author=False, ephemeral=True)
 	else:
-		await ctx.send(f"""```md
-General ext.commands error
-{error}
-<Command: {ctx.command}>
-<Message: {ctx.message.content}>```""", delete_after=15.0, reference=ctx.message, mention_author=False)
+		debug_cnl = bot.get_channel(int(os.environ['discord_channel_debug']))
+		embed = discord.Embed(title="Unhandled custom pycord error", description=f"Command: {ctx.command}")
+		embed.add_field(name="Details:", value=f"{error}")
+		embed.set_footer(text=f"Message: {ctx.message.content if ctx.message is not None else error}")
+		await ctx.send(embed=embed, reference=ctx.message, mention_author=False)
+		await debug_cnl.send(content=f"Message URL: {ctx.message.jump_url}" if ctx.message is not None else f"Message: {error}", embed=embed)
 
 ###
 ### RUN EVERYTHING ###
@@ -437,9 +459,17 @@ if 'weather' in sys.modules:
 if 'keep_alive' in sys.modules:
 	keep_alive()
 
-loop = asyncio.get_event_loop()
-bot_loop = loop.create_task(bot.start(os.getenv('TOKEN')))
-loops = asyncio.gather(bot_loop, loop=loop)
-loop.run_until_complete(loops)
+try:
+	loop = asyncio.get_event_loop()
+	bot_loop = loop.create_task(bot.start(os.getenv('TOKEN')))
+	loops = asyncio.gather(bot_loop, loop=loop)
+	loop.run_until_complete(loops)
+except KeyboardInterrupt:
+	loop.run_until_complete(bot.close())
+finally:
+	loop.close()
 
+'''if 'weather' in sys.modules:
+	sched_weather.cancel()
+	sched_weather.stop()'''
 #bot.run(os.getenv( 'TOKEN' ))

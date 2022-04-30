@@ -27,6 +27,7 @@
 + **0.3**: added 2-hour interval mid-day in addition to 4-hour interval daily
 + **0.3_01**: code cleanup and absolute timing for 2-hour interval
 + **0.3_02**: fixed weather loop clean up routine
++ **1.0**: Weather app go brrr ! !
 #
 ### Web Server
 + **0.1**: added redirect to uptimerobot monitor
