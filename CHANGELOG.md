@@ -16,7 +16,14 @@
 + **1.3_03**: added `ext.commands` error handlers
 + **1.3_04**: major overhaul to the `roll` command
 + **1.3_05**: reverted v1.3_01 after during Christmas 2021
-+ **1.4**: added Discord Together; temporarily removed Discord Interactions
++ **1.4**: added Discord Together; ~temporarily removed Discord Interactions~
++ **1.5**: multiple updates and overhauls : **Successful switch to `pycord`**
+	- Moved RNG to another python file
+  - Added multiple new Slash Commands
+  - Updated `Discord Together` (A.K.A Activities) activator
+  - Added bot shutdown as an admin only command
+  - Added bot reboot as an admin only command
+  - Re-did bot activation with `AsyncIO: create_task()` method
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
@@ -27,7 +34,8 @@
 + **0.3**: added 2-hour interval mid-day in addition to 4-hour interval daily
 + **0.3_01**: code cleanup and absolute timing for 2-hour interval
 + **0.3_02**: fixed weather loop clean up routine
-+ **1.0**: Weather app go brrr ! !
++ **1.0**: Image retrival overhaul optimized for speed
++ **1.1**: Added [`North-West Pacific`](https://www.goes.noaa.gov/dml/jma/nhem/nwpac/rb.html "Northwest Pacific infrared 1 loop")
 #
 ### Web Server
 + **0.1**: added redirect to uptimerobot monitor
@@ -36,24 +44,25 @@
 + **0.4**: migrated all redirect to [reloc.tk](https://www.reloc.tk/ "https://www.reloc.tk/")
 + **1.0**: site shows simple page to invite bot
 #
-### Virus Scanning
-A Passive virus scan with the help of VirusTotal API. Alerts the channel if and only if an attachment or link has/is a malware.
-+ To do
-+ Development links: [Official VirusTotal API for Python](https://github.com/VirusTotal/vt-py/ "vt-py")
-+ **0.1**: added file scanning
+### ~~Virus~~ Link Malware Scanning
+~~A Passive virus scan with the help of VirusTotal API. Alerts the channel if and only if an attachment or link has/is a malware.~~
++ ~~To do~~
++ ~~Development links: [Official VirusTotal API for Python](https://github.com/VirusTotal/vt-py/ "vt-py")~~
++ ~~**0.1**: added file scanning~~
++ ### **_Removed file scanning_**
++ ### **_Added Link Malware Scanning_**
+	+ Check [`Sinking Yachts`](https://phish.sinking.yachts/docs "Sinking Yachts Documentation") to check unknown domains sent on chat for potential phishing link.
 
 #
 #
 
 # FUTURE PLANS
 ### Currently Doing
-+ Slow transition from Rapptz's `discord.py` to `Pycord`
++ nothing
 #
 ### To Do
 ###### **_Expand items on To Do list. Be more concise._**
-+ Change how file input is sent (discord file links don't work -> Need premium)
-+ Implement attachment virus scanning with VirusTotal API
-  + Additionally, Link malware scanning
++ Add more image loops
 # 
 ### Halted
 + Integrate Himawari-8 weather images
