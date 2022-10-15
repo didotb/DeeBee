@@ -1,45 +1,97 @@
-import wget, os, multiprocessing as mp, time as tm
+import wget, os, multiprocessing as mp#, time as tm
+from functools import partial
 from os import path
 
-config = './weather/irgmsw.cfg'
-filenames = './weather/filenames.txt'
-imageDIR = './weather/img/'
 target = "./out.mp4"
 
-def weather( time='latest' ):
-  if( time == 'latest' ):
-    configURL = 'https://www.goes.noaa.gov/sohemi/sohemiloops/irgmsw.cfg'
-    baseURL = 'https://www.goes.noaa.gov/sohemi/sohemiloops/'
+configSRC = {
+  'sw':'https://www.goes.noaa.gov/sohemi/sohemiloops/irgmsw.cfg',
+  'nw':'https://www.goes.noaa.gov/dimg/jma/nhem/nwpac/txtfiles/rb_names.txt'
+}
 
-    if( os.listdir( imageDIR ) != [] ):
-      os.system( "rm " + imageDIR + "*" )
-    if( path.exists( config ) ):
-      os.system( "rm " + config )
+imageSRC = {
+  'sw':'https://www.goes.noaa.gov/sohemi/sohemiloops/',
+  'nw':'http://www.ssd.noaa.gov/jma/nwpac/'
+}
 
-    wget.download( configURL, config )
-    os.system( "cat " + config + " | grep 'filenames = ' | sed 's|filenames = ||' > " + filenames )
+region = {
+  'sw':'./weather/img/sw/',
+  'nw':'./weather/img/nw/'
+}
 
-    p = mp.Pool(mp.cpu_count())
-    with open( filenames ) as names:
-      for i in names:
-        temp = i.strip('\n').split( ', ' )
-        p.map(dl_start, [[str(baseURL+i)] for i in temp])
-      names.close()
-    p.close()
+config = {
+  'sw':'./weather/irgmsw.cfg',
+  'nw':'./weather/rb_names.txt'
+}
 
-    imageFiles = [os.path.join(imageDIR,files) for files in os.listdir(imageDIR)]
-    c=0
-    for i in imageFiles:
-      os.rename(i,str(os.path.join(imageDIR,"0"+str(c)+".jpg")))
-      c+=1
-    os.system( "ffmpeg -i " + imageDIR + "0%d.jpg -c:v libx264 -pix_fmt yuv420p -an -filter_complex '[0]setpts=3*PTS' -preset veryfast -y " + target )
+filenames = {
+  'sw':'./weather/filesw.txt',
+  'nw':'./weather/filenw.txt'
+}
 
-def dl_start(frames):
+class SwitcherNoneType(Exception):
+  pass
+
+def weather( regionCode='sw' ):
+  regionDIR = region.get(regionCode,None)
+  configDIR = config.get(regionCode,None)
+  filenameList = filenames.get(regionCode,None)
+  configURL = configSRC.get(regionCode,None)
+  baseURL = imageSRC.get(regionCode,None)
+
+  if regionDIR is None:
+    raise SwitcherNoneType("regionCode not found or out of bounds.")
+  if configDIR is None:
+    raise SwitcherNoneType("Configuration directory is missing.")
+  if filenameList is None:
+    raise SwitcherNoneType("List of filename is missing in directory.")
+  if configURL is None:
+    raise SwitcherNoneType("Configuration URL cannot be found.")
+  if baseURL is None:
+    raise SwitcherNoneType("Base URL for images not specified.")
+
+  if( os.listdir( regionDIR ) != [] ):
+    os.system( "rm " + regionDIR + "*" )
+  if( path.exists( configDIR ) ):
+    os.system( "rm " + configDIR )
+
+  wget.download( configURL, configDIR )
+
+  if regionCode == 'nw':
+    os.system(f"cat {configDIR} | cut -d ' ' -f1 > {filenameList}")
+  if regionCode == 'sw':
+    os.system( f"cat {configDIR} | grep 'filenames = ' | sed 's|filenames = ||' > {filenameList}.temp" )
+    with open(filenameList,'w') as f:
+      for line in [i.strip('\n').split(', ') for i in open(f"{filenameList}.temp")][0]:
+        f.write(f"{line}\n")
+    os.system(f"rm {filenameList}.temp")
+
+  names = list(map(str,open(filenameList)))
+  p = mp.Pool(mp.cpu_count())
+  part = partial(dl_start, regionDIR)
+  p.map(part,[[str(baseURL+i)] for i in [names[j].strip('\n') for j in range(0,len(names))]])
+  p.close()
+
+  imageFiles = [os.path.join(regionDIR,files) for files in os.listdir(regionDIR)]
+  c=0
+  for i in imageFiles:
+    if regionCode == 'sw':
+      os.rename(i,str(os.path.join(regionDIR,f"0{str(c)}.jpg")))
+    if regionCode == 'nw':
+      os.system(f"ffmpeg -i {i} -c:v mjpeg {regionDIR}0{str(c)}.jpg")
+      #os.rename(i,str(os.path.join(regionDIR,f"0{str(c)}.jpg")))
+    c+=1
+  os.system( f"ffmpeg -i {regionDIR}0%d.jpg -c:v libx264 -pix_fmt yuv420p -an -filter_complex '[0]setpts=3*PTS' -preset veryfast -y {target}" )
+
+def dl_start(regionDIR, frames):
   for j in frames:
-    os.system("wget -P "+imageDIR+" "+j)
+    os.system("wget -P "+regionDIR+" "+j)
 
 def clean():
-	if path.exists( target ): os.system( "rm " + target )
-	if path.exists( imageDIR ): os.system( "rm " + imageDIR + "*" )
-	if path.exists( filenames ): os.system( "rm " + filenames )
-	if path.exists( config ): os.system( "rm " + config )
+  for i in region.values():
+    if path.exists( i ): os.system( "rm " + i + "*" )
+  for i in filenames.values():
+    if path.exists( i ): os.system( "rm " + i )
+  for i in config.values():
+    if path.exists( i ): os.system( "rm " + i )
+  if path.exists( target ): os.system( "rm " + target )
