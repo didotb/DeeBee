@@ -1,5 +1,4 @@
 import discord, os, asyncio, pytz, datetime, random, sys, requests
-import subprocess, aternos_handler as ah
 from html.parser import HTMLParser
 from discord import default_permissions
 from discord.ext import commands, tasks
