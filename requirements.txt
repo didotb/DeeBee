@@ -1,0 +1,5 @@
+py-cord==2.2.2
+pytz
+discord-together
+asyncio
+wget
