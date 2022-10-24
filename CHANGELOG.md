@@ -63,6 +63,8 @@
 #
 ### To Do
 ###### **_To do: Expand items on To Do list. Be more concise._**
++ Switch `asyncio.gather()` to `asyncio.TaskGroup()` in the stable release of Python 3.11
+  - [Python 3.11 changelog summary by mCoding](https://www.youtube.com/watch?v=ueTXYhtlnjA "It's time... for PYTHON 3.11!")
 + Add more image loops
 + Auto-check domains to Sinking Yachts if not whitelisted
   - Display warning if domain is blacklisted in Sinking Yachts
