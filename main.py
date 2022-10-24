@@ -32,18 +32,14 @@ async def emote(animated, emojiName):
 	eName = emojiName.lower()
 	for i in bot.emojis:
 		j = str(i)
-		if animated is True:
-			if eName in j.lower() and '<a:' in j.lower():
-				return j
-		elif animated is False:
-			if eName in j.lower() and '<a:' not in j.lower():
-				return j
-		else:
-			return "Argument `animated` is missing."
-	if animated == False:
-		return "`Error retrieving emote. Check name or spelling.`"
-	elif animated == True:
-		return "`Error retriving animated emote. Check name or spelling.`"
+		##
+		## match case for 3.10
+		##
+		if animated is True and eName in j.lower() and '<a:' in j.lower():
+			return j
+		elif animated is False and eName in j.lower() and '<a:' not in j.lower():
+			return j
+	return "`Error retrieving emote. Check name or spelling.`"
 
 # main vca function
 async def act_app(vcid, app_name=None):
@@ -136,7 +132,7 @@ if 'weather' in sys.modules:
 		minutes = int(dt.strftime('%M'))
 		seconds = int(dt.strftime('%S'))
 		wait = (3600)-((minutes*60)+seconds) # wait for an absolute hour
-		print("weather 'before loop' started")
+		print("weather 'before loop' called")
 		await asyncio.sleep( wait )
 		await bot.wait_until_ready()
 
@@ -180,7 +176,7 @@ async def xmas_loop_before():
 	minutes = int(dt.strftime('%M'))
 	seconds = int(dt.strftime('%S'))
 	wait = (3600)-((minutes*60)+seconds) # wait for an absolute hour
-	print("xmas 'before loop' started")
+	print("xmas 'before loop' called")
 	await asyncio.sleep(wait)
 	await bot.wait_until_ready()
 
@@ -451,20 +447,36 @@ async def slash_weather(ctx, action='sw'):
 
 @bot.slash_command(name="announcement", description="Send an announcement to a channel.")
 @default_permissions(moderate_members=True)
-async def slash_announcement(ctx, content:str, test:bool, tag:str=['here','everyone'], colour:int=0xffb9d2, channel:str=None):
+async def slash_announcement(ctx, content:str, test:bool, tag:str=['here','everyone'], colour:int=0xffb9d2, channel_id:str=None):
 	embed = discord.Embed(title="Announcement", description=f"Author: {ctx.author}", colour=int(colour))
 	#embed.set_thumbnail(url=ctx.author.display_avatar)
 	embed.add_field(name="Content:", value=content)
 	embed.set_footer(text=f"Published: {datetime.datetime.now(datetime.timezone.utc).astimezone(pytz.timezone('Asia/Manila')).strftime('%b %d, %Y :: %I.%M.%S %p')}")
 	tag = None if isinstance(tag, list) else tag
 	tag_switcher = {'here':'@here','everyone':'@everyone'}
-	if (channel is not None) and (test is False):
-		cnl = bot.get_channel(int(channel))
-		if(cnl.permissions_for(cnl.guild.get_member(ctx.author.id)).send_messages):
-			await cnl.send(content=tag_switcher.get(tag,None),embed=embed)
-			await ctx.respond(content="Message sent")
-		else:
-			raise commands.MissingPermissions()
+	if (channel_id is not None) and (test is False):
+		channel_id = channel_id.split(' ')
+		if len(channel_id)==1:
+			cnl = bot.get_channel(int(channel_id[0]))
+			if(cnl.permissions_for(cnl.guild.get_member(ctx.author.id)).send_messages):
+				await cnl.send(content=tag_switcher.get(tag,None),embed=embed)
+				await ctx.respond(content="Announcement sent")
+			else:
+				raise commands.MissingPermissions()
+		elif len(channel_id)>1:
+			chnl_num:int = 0
+			not_sent:list = []
+			for chnl in channel_id:
+				cnl = bot.get_channel(int(chnl))
+				if(cnl.permissions_for(cnl.guild.get_member(ctx.author.id)).send_messages):
+					await cnl.send(content=tag_switcher.get(tag,None),embed=embed)
+					chnl_num += 1
+				else:
+					not_sent.append(chnl)
+					pass
+			not_sent = "; ".join(not_sent) if len(not_sent) > 0 else []
+			respond = f"Announcement sent to {chnl_num} channels." if len(not_sent) == 0 else f"Announcement sent to {chnl_num} channels.\nCould not send to these channels: `{not_sent}`"
+			await ctx.respond(content=respond)
 	else:
 		await ctx.respond(content=tag_switcher.get(tag,None), embed=embed, ephemeral=False if test==False else True)
 
@@ -556,8 +568,9 @@ async def slash_restart(ctx, reason=None, schedule=5, silent:bool=True):
 	os.execv(sys.executable, ['python'] + sys.argv)
 
 @bot.slash_command(name="emote",description="Send an emote then an optional message.")
-async def slash_emote(ctx, emotes, msg=None):
-	message = [await emote(False, e) for e in emotes.lower().split()]
+async def slash_emote(ctx, emotes, msg=None, animated=False):
+	animated = True if animated is True else False
+	message = [await emote(animated, e) for e in emotes.lower().split()]
 	if msg is not None:
 		message.append(msg)
 	await ctx.send(content=' '.join(message))
@@ -594,24 +607,76 @@ async def on_command_error(ctx, error):
 ### RUN EVERYTHING ###
 ###
 
-def run():
+### BROKEN RUN METHOD 3.10
+#def run():
+#	if 'keep_alive' in sys.modules:
+#		keep_alive()
+#
+#	xmas_loop.start()
+#
+#	async def bot_loop_gather(action:str='start'):
+#		#async_tasks = set()
+#		loop = asyncio.get_event_loop()
+#		start_action = loop.create_task(bot.start(os.getenv('TOKEN'))) if action == 'start' else loop.create_task(bot.close())
+#		start_sched_weather = loop.create_task(sched_weather.start()) if 'weather' in sys.modules else None
+#
+#		#async_tasks.add(start_action)
+#		#start_action.add_done_callback(async_tasks)
+#
+#		result = await asyncio.gather(start_action,start_sched_weather)
+#		return result
+#	try:
+#		asyncio.run(bot_loop_gather('start'))
+#	except KeyboardInterrupt:
+#		sched_weather.cancel()
+#		xmas_loop.cancel()
+#		asyncio.run(bot_loop_gather('stop'))
+
+### Works in 3.10
+async def bot_start():
 	if 'weather' in sys.modules:
 		sched_weather.start()
 	if 'keep_alive' in sys.modules:
 		keep_alive()
-
 	xmas_loop.start()
+	await bot.start(os.getenv('TOKEN'))
 
-	loop = asyncio.get_event_loop()
-	bot_loop = loop.create_task(bot.start(os.getenv('TOKEN')))
-	loops = asyncio.gather(bot_loop, loop=loop)
-	try:
-		loop.run_until_complete(loops)
-	except KeyboardInterrupt:
+async def bot_stop():
+	if 'weather' in sys.modules:
 		sched_weather.cancel()
-		xmas_loop.cancel()
-		loop.run_until_complete(bot.close())
-	finally:
-		loop.close()
+	xmas_loop.cancel()
+	await bot.close()
 
+async def gatherer(run_task):
+	run = bot_start() if run_task == 'start' else bot_stop()
+	await asyncio.gather(run)
+
+#if __name__ == '__main__':
+#	try:
+#		asyncio.run(gatherer('start'))
+#	except KeyboardInterrupt:
+#		asyncio.run(gatherer('stop'))
+#	finally:
+#		print("Bot has stopped.")
+
+### OLDER RUN METHOD THAT WORKS FOR 3.8
+#def run():
+#	if 'weather' in sys.modules:
+#		sched_weather.start()
+#	if 'keep_alive' in sys.modules:
+#		keep_alive()
+#	xmas_loop.start()
+#
+#	loop = asyncio.get_event_loop()
+#	bot_loop = loop.create_task(bot.start(os.getenv('TOKEN')))
+#	loops = asyncio.gather(bot_loop, loop=loop)
+#	try:
+#		loop.run_until_complete(loops)
+#	except KeyboardInterrupt:
+#		sched_weather.cancel()
+#		xmas_loop.cancel()
+#		loop.run_until_complete(bot.close())
+#	finally:
+#		loop.close()
+#
 #run()

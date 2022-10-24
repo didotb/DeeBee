@@ -18,12 +18,13 @@
 + **1.3_05**: reverted v1.3_01 after during Christmas 2021
 + **1.4**: added Discord Together; ~temporarily removed Discord Interactions~
 + **1.5**: multiple updates and overhauls : **Successful switch to `pycord`**
-	- Moved RNG to another python file
+  - Moved RNG to another python file
   - Added multiple new Slash Commands
   - Updated `Discord Together` (A.K.A Activities) activator
   - Added bot shutdown as an admin only command
   - Added bot reboot as an admin only command
-  - Re-did bot activation with `AsyncIO: create_task()` method
+  - ~Re-did bot activation with `AsyncIO: create_task()` method~
++ **1.5_01**: Re-did bot activation with `asyncio.run()` method due to deprecation of `get_current_loop()` method
 #
 ### Weather app
 + **0.1**: simple app to pull weather images, then convert to video
@@ -51,7 +52,7 @@
 + ~~**0.1**: added file scanning~~
 + ### **_Removed file scanning_**
 + ### **_Added Link Malware Scanning_**
-	+ Check [`Sinking Yachts`](https://phish.sinking.yachts/docs "Sinking Yachts Documentation") to check unknown domains sent on chat for potential phishing link.
+  + Check [`Sinking Yachts`](https://phish.sinking.yachts/docs "Sinking Yachts Documentation") to check unknown domains sent on chat for potential phishing link.
 
 #
 #
@@ -61,8 +62,10 @@
 + nothing
 #
 ### To Do
-###### **_Expand items on To Do list. Be more concise._**
+###### **_To do: Expand items on To Do list. Be more concise._**
 + Add more image loops
++ Auto-check domains to Sinking Yachts if not whitelisted
+  - Display warning if domain is blacklisted in Sinking Yachts
 # 
 ### Halted
 + Integrate Himawari-8 weather images
