@@ -1,5 +1,5 @@
 import discord, os, asyncio, pytz, datetime, random, sys, requests
-from html.parser import HTMLParser
+from html import unescape
 from discord import default_permissions
 from discord.ext import commands, tasks
 from discord.commands import Option
@@ -24,7 +24,6 @@ negative = ['false', 'f']
 msgTrigA = ['wiggle', 'jiggle', 'popcat', 'catjam', 'new pc', 'blobdance', 'pepeds', 'cum']
 msgTrig = ['bij', 'bitch']
 msgYEP = ['sock', 'cock', 'rock', 'dock', 'duck', 'stock', 'clock', 'croc', 'lock', 'knock', 'mock', 'jock']
-hp = HTMLParser()
 bot = commands.Bot( command_prefix=listener, intents=discord.Intents.all(), owner_id=int(os.environ['discord_user_db']), strip_after_prefix=True )
 
 # emote searcher
@@ -112,7 +111,7 @@ if 'weather' in sys.modules:
 		dt = datetime.datetime.now(datetime.timezone.utc).astimezone(pytz.timezone('Asia/Manila'))
 		hours = int(dt.strftime('%H'))
 		await debug(cmsg=f"(weather): Another hour has passed: {hours}")
-		channel = bot.get_channel( int( os.environ[ 'discord_channel_vii_weather' ] ) )
+		channel = bot.get_channel(int(os.environ['discord_channel_vii_weather']))
 
 		if hours in [0,4,8,10,12,14,16,20]:
 			await debug(cmsg="Started weather command")
@@ -165,8 +164,8 @@ async def xmas_loop():
 		await debug(cmsg=f"Error in xmas_loop: response_code returned {trivia['response_code']}. Expected 0")
 		return
 	picked = random.choice(trivia['results'])
-	question = hp.unescape(picked['question'])
-	answer = hp.unescape(picked['correct_answer'])
+	question = unescape(picked['question'])
+	answer = unescape(picked['correct_answer'])
 
 	await channel.send(f"@here Question: {question}\nAnswer: ||{answer}||\nAnyway, **it's {str(int(delta.days)+1)} days before Christmas!**")
 
@@ -647,9 +646,16 @@ async def bot_stop():
 	xmas_loop.cancel()
 	await bot.close()
 
+## temporary custom exception
+class GathererException(Exception):
+	pass
+
 async def gatherer(run_task):
 	run = bot_start() if run_task == 'start' else bot_stop()
-	await asyncio.gather(run)
+	result = await asyncio.gather(run, return_exceptions=True)
+	exceptions = [e for e in result if isinstance(e,Exception)]
+	if exceptions:
+		raise GathererException("Gatherer Exception: ", exceptions)
 
 #if __name__ == '__main__':
 #	try:
