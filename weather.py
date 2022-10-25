@@ -82,16 +82,16 @@ def weather( regionCode='sw' ):
       #os.rename(i,str(os.path.join(regionDIR,f"0{str(c)}.jpg")))
     c+=1
   os.system( f"ffmpeg -i {regionDIR}0%d.jpg -c:v libx264 -pix_fmt yuv420p -an -filter_complex '[0]setpts=3*PTS' -preset veryfast -y {target}" )
+  clean(regionCode)
 
 def dl_start(regionDIR, frames):
   for j in frames:
     os.system("wget -P "+regionDIR+" "+j)
 
-def clean():
-  for i in region.values():
-    if path.exists( i ): os.system( "rm " + i + "*" )
-  for i in filenames.values():
-    if path.exists( i ): os.system( "rm " + i )
-  for i in config.values():
-    if path.exists( i ): os.system( "rm " + i )
-  if path.exists( target ): os.system( "rm " + target )
+def clean(pathCode):
+  if pathCode != "target":
+    if path.exists(region.get(pathCode)): os.system("rm "+region.get(pathCode)+"*")
+    if path.exists(filenames.get(pathCode)): os.system("rm "+filenames.get(pathCode))
+    if path.exists(config.get(pathCode)): os.system( "rm "+config.get(pathCode))
+  elif path.exists(target) and pathCode == "target": os.system("rm "+target)
+  else: return

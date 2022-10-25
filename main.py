@@ -122,7 +122,7 @@ if 'weather' in sys.modules:
 
 		if os.path.exists(weather.target):
 			await debug(pmsg=4)
-			weather.clean()
+			weather.clean("target")
 			await debug(pmsg=0)
 
 	@sched_weather.before_loop
@@ -322,7 +322,7 @@ async def send_weather(ctx, action='sw'):
 		await asyncio.sleep(5)
 	await ctx.send(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'))
 	await debug( pmsg=4 )
-	weather.clean()
+	weather.clean("target")
 	await debug( pmsg=0 )
 
 @bot.command( name='bitch', aliases=['bij'], hidden=True )
@@ -441,7 +441,7 @@ async def slash_weather(ctx, action='sw'):
 			await asyncio.sleep(10)
 		await ctx.edit(content="Please use weather command sparingly. Bot might get banned for using too much resource.", file=discord.File('out.mp4'))
 		await debug( pmsg=4 )
-		weather.clean()
+		weather.clean("target")
 		await debug( pmsg=0 )
 
 @bot.slash_command(name="announcement", description="Send an announcement to a channel.")
